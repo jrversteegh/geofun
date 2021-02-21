@@ -6,6 +6,9 @@ ext_modules = [
     Pybind11Extension(
         "geofun2",
         sorted(glob("src/*.cpp")),
+        include_dirs=['contrib/install/include'],
+        library_dirs=['contrib/install/lib'],
+        libraries=['Geographic'],
     ),
 ]
 

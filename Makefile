@@ -14,14 +14,14 @@ contrib/geographiclib/CMakeLists.txt:
 contrib/geographiclib/BUILD/Makefile: contrib/geographiclib/CMakeLists.txt
 	@which cmake >/dev/null || (echo "cmake is required to build" && exit 1)
 	@mkdir -p contrib/geographiclib/BUILD
-	@cd contrib/geographiclib/BUILD && cmake -DCMAKE_INSTALL_PREFIX=../../install -DGEOGRAPHICLIB_LIB_TYPE=STATIC ..
+	@cd contrib/geographiclib/BUILD && cmake -DCMAKE_INSTALL_PREFIX=../../install -DGEOGRAPHICLIB_LIB_TYPE=STATIC -DCMAKE_CXX_FLAGS=-fPIC ..
 
 contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
 	@which make >/dev/null || (echo "make is required to build" && exit 1)
 	@mkdir -p contrib/install
 	@cd contrib/geographiclib/BUILD && make -j 4 install
 
-$(WHEEL_NAME): venv/updated $(SOURCE)
+$(WHEEL_NAME): venv/updated $(SOURCE) contrib/install/lib/libGeographic.a
 	@echo "Building: $(WHEEL_NAME) from $(SOURCE)"
 	@. venv/bin/activate; $(PYTHON) setup.py bdist_wheel
 
@@ -31,7 +31,7 @@ build: contrib/install/lib/libGeographic.a $(WHEEL_NAME)
 venv/lib/python$(PYTHON_VERSION)/site-packages/geofun2$(EXTENSION_SUFFIX): $(WHEEL_NAME)
 	@echo "Installing: $@"
 	@if [ ! -f $(WHEEL_NAME) ]; then echo "Wheel doesn't exist. Do make again"; make; exit 0; else . venv/bin/activate; pip install $(WHEEL_NAME); fi
-	@touch "$@"
+	@if [ -f "$@" ]; then touch "$@"; fi
 
 .PHONY: install
 install: venv/lib/python$(PYTHON_VERSION)/site-packages/geofun2$(EXTENSION_SUFFIX)
@@ -56,10 +56,8 @@ codestyle: packages
 clean:
 	@echo "Cleaning up python cache..."
 	@find . -type d -name __pycache__ | xargs rm -rf
-	@echo "Cleaning up contrib install..."
-	@rm -rf contrib/install
-	@echo "Cleaning up GeographicLib..."
-	@rm -rf contrib/geographiclib/BUILD
+	@echo "Cleaning up egg-info..."
+	@find . -type d -name "*.egg-info" | xargs rm -rf
 	@echo "Cleaning up build..."
 	@rm -rf build
 	@echo "Cleaning up dist..."
@@ -68,6 +66,10 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	@echo "Cleaning up contrib install..."
+	@rm -rf contrib/install
+	@echo "Cleaning up GeographicLib..."
+	@rm -rf contrib/geographiclib/BUILD
 	@echo "Removing virtual environment..."
 	@which $(PYTHON) | grep venv >/dev/null 2>/dev/null && echo "Deactivate your virtual environment first" && exit 1 || echo "Virtual environment not active" 
 	@rm -rf venv
