@@ -1,4 +1,6 @@
+PYTHON := python3
 VERSION := $(shell awk -F "=" '/version/ {print $$2}' setup.cfg | sed "s/ //g")
+WHEEL_NAME := $(shell if [ -d venv ]; then . venv/bin/activate; fi;$(PYTHON) -c "from setuptools.dist import Distribution;dist=Distribution(attrs={'name': 'geofun2','version':'$(VERSION)','ext_modules':['geofun2']});cmd=dist.get_command_obj('bdist_wheel');cmd.ensure_finalized();tag='-'.join(cmd.get_tag());print(f'dist/{cmd.wheel_dist_name}-{tag}.whl')")
 
 .PHONY: all
 all: $(ALL_TARGETS) test
@@ -16,17 +18,19 @@ contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
 	@mkdir -p contrib/install
 	@cd contrib/geographiclib/BUILD && make -j 4 install
 
-dist/geofun2%.whl: packages
-	@. venv/bin/activate; python setup.py bdist_wheel
+$(WHEEL_NAME): packages
+	@. venv/bin/activate; $(PYTHON) setup.py bdist_wheel
 
 .PHONY: build
-build: contrib/install/lib/libGeographic.a dist/geofun2-$(VERSION)-*.whl
+build: contrib/install/lib/libGeographic.a $(WHEEL_NAME)
 
 .PHONY: install
 install: build
+	@echo "Installing: $(WHEEL_NAME)"
+	@if [ ! -f $(WHEEL_NAME) ]; then echo "Wheel doesn't exist. Do make again"; make; exit 0; else . venv/bin/activate; pip install $(WHEEL_NAME); fi
 
 .PHONY: test
-test: codestyle build
+test: codestyle install
 	@echo "Running tests...."
 	@. venv/bin/activate; pytest -v tests
 	@echo "Done."
@@ -46,19 +50,19 @@ clean:
 	@echo "Cleaning up python cache..."
 	@find . -type d -name __pycache__ | xargs rm -rf
 	@echo "Cleaning up contrib install..."
-	@rm -r contrib/install
+	@rm -rf contrib/install
 	@echo "Cleaning up GeographicLib..."
-	@rm -r contrib/geographiclib/BUILD
+	@rm -rf contrib/geographiclib/BUILD
 	@echo "Cleaning up build..."
-	@rm -r build
+	@rm -rf build
 	@echo "Cleaning up dist..."
-	@rm -r dist
+	@rm -rf dist
 	@echo "Done."
 
 .PHONY: distclean
 distclean: clean
 	@echo "Removing virtual environment..."
-	@which python | grep venv >/dev/null 2>/dev/null && echo "Deactivate your virtual environment first" && exit 1 || echo "Virtual environment not active" 
+	@which $(PYTHON) | grep venv >/dev/null 2>/dev/null && echo "Deactivate your virtual environment first" && exit 1 || echo "Virtual environment not active" 
 	@rm -rf venv
 	@echo "Done."
 
@@ -67,8 +71,10 @@ packages: venv/updated
 
 venv/bin/activate:
 	@echo "Setting up virtual environment..."
-	@(which python3.8 >/dev/null && python3.8 -mvenv venv) || \
-	   (which python3.7 >/dev/null && python3.7 -mvenv venv)
+	@(which python3.9 >/dev/null && which python3.9-config >/dev/null && python3.9 -mvenv venv) || \
+	   (which python3.8 >/dev/null && which python3.8-config >/dev/null && python3.8 -mvenv venv) || \
+	   (which python3.7 >/dev/null && which python3.7-config >/dev/null && python3.7 -mvenv venv) || \
+	   (echo "No python that has development files and virtualenv installed found. Maybe do 'apt install python3-dev python3-venv'?"; exit 1)
 	@echo "Done."
 
 venv/updated: venv/bin/activate requirements.txt
