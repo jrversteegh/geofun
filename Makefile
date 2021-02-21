@@ -1,4 +1,4 @@
-EXTENSION_SUFFIX := $(shell python3-config --extension-suffix)
+VERSION := $(shell awk -F "=" '/version/ {print $$2}' setup.cfg | sed "s/ //g")
 
 .PHONY: all
 all: $(ALL_TARGETS) test
@@ -16,13 +16,11 @@ contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
 	@mkdir -p contrib/install
 	@cd contrib/geographiclib/BUILD && make -j 4 install
 
-build/geofun2$(EXTENSION_SUFFIX): packages
-	@which c++ >/dev/null || (echo "c++ is required to build" && exit 1)
-	@mkdir -p build
-	@. venv/bin/activate; c++ -O3 -Wall -shared -std=c++11 -fPIC -I contrib/install/include $(shell python3 -m pybind11 --includes) src/geofun2.cpp -o $@
+dist/geofun2%.whl: packages
+	@. venv/bin/activate; python setup.py bdist_wheel
 
 .PHONY: build
-build: contrib/install/lib/libGeographic.a build/geofun2$(EXTENSION_SUFFIX)
+build: contrib/install/lib/libGeographic.a dist/geofun2-$(VERSION)-*.whl
 
 .PHONY: install
 install: build
@@ -51,6 +49,10 @@ clean:
 	@rm -r contrib/install
 	@echo "Cleaning up GeographicLib..."
 	@rm -r contrib/geographiclib/BUILD
+	@echo "Cleaning up build..."
+	@rm -r build
+	@echo "Cleaning up dist..."
+	@rm -r dist
 	@echo "Done."
 
 .PHONY: distclean

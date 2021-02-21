@@ -1,6 +1,8 @@
 *.pyc
 *.log
-build
+*.egg-info
+/build
+/dist
 /.env
 /venv
 /contrib/install
