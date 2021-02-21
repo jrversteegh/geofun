@@ -5,13 +5,15 @@
 #include <GeographicLib/Rhumb.hpp>
 #include <GeographicLib/Constants.hpp>
 
+#include "version.h"
+
 using namespace GeographicLib;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
 
 std::string get_version() {
-  return "0.0.1";
+  return VERSION;
 }
 
 

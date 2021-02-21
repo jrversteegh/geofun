@@ -5,4 +5,5 @@
 /dist
 /.env
 /venv
+/src/version.h
 /contrib/install
