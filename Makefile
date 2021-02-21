@@ -1,6 +1,9 @@
 PYTHON := python3
+PYTHON_VERSION := $(shell if [ -d venv ]; then . venv/bin/activate; fi; $(PYTHON) -c "import sys; print(f'{sys.version_info[0]}.{sys.version_info[1]}')")
+SOURCE := $(wildcard src/*.cpp)
 VERSION := $(shell awk -F "=" '/version/ {print $$2}' setup.cfg | sed "s/ //g")
-WHEEL_NAME := $(shell if [ -d venv ]; then . venv/bin/activate; fi;$(PYTHON) -c "from setuptools.dist import Distribution;dist=Distribution(attrs={'name': 'geofun2','version':'$(VERSION)','ext_modules':['geofun2']});cmd=dist.get_command_obj('bdist_wheel');cmd.ensure_finalized();tag='-'.join(cmd.get_tag());print(f'dist/{cmd.wheel_dist_name}-{tag}.whl')")
+EXTENSION_SUFFIX := $(shell if [ -d venv ]; then . venv/bin/activate; fi; python$(PYTHON_VERSION)-config --extension-suffix)
+WHEEL_NAME := $(shell if [ -d venv ]; then . venv/bin/activate; fi; $(PYTHON) -c "from setuptools.dist import Distribution;dist=Distribution(attrs={'name': 'geofun2','version':'$(VERSION)','ext_modules':['geofun2']});cmd=dist.get_command_obj('bdist_wheel');cmd.ensure_finalized();tag='-'.join(cmd.get_tag());print(f'dist/{cmd.wheel_dist_name}-{tag}.whl')")
 
 .PHONY: all
 all: $(ALL_TARGETS) test
@@ -18,16 +21,20 @@ contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
 	@mkdir -p contrib/install
 	@cd contrib/geographiclib/BUILD && make -j 4 install
 
-$(WHEEL_NAME): packages
+$(WHEEL_NAME): venv/updated $(SOURCE)
+	@echo "Building: $(WHEEL_NAME) from $(SOURCE)"
 	@. venv/bin/activate; $(PYTHON) setup.py bdist_wheel
 
 .PHONY: build
 build: contrib/install/lib/libGeographic.a $(WHEEL_NAME)
 
-.PHONY: install
-install: build
-	@echo "Installing: $(WHEEL_NAME)"
+venv/lib/python$(PYTHON_VERSION)/site-packages/geofun2$(EXTENSION_SUFFIX): $(WHEEL_NAME)
+	@echo "Installing: $@"
 	@if [ ! -f $(WHEEL_NAME) ]; then echo "Wheel doesn't exist. Do make again"; make; exit 0; else . venv/bin/activate; pip install $(WHEEL_NAME); fi
+	@touch "$@"
+
+.PHONY: install
+install: venv/lib/python$(PYTHON_VERSION)/site-packages/geofun2$(EXTENSION_SUFFIX)
 
 .PHONY: test
 test: codestyle install
