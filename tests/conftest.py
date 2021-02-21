@@ -28,3 +28,11 @@ logging.basicConfig(
     filemode='w',
     format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
 )
+
+
+@pytest.fixture
+def log(request):
+    result = logging.getLogger(f'test.{request.node.name}')
+    yield result
+    for handler in result.handlers:
+        handler.flush()

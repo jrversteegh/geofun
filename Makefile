@@ -30,7 +30,7 @@ build: contrib/install/lib/libGeographic.a $(WHEEL_NAME)
 
 venv/lib/python$(PYTHON_VERSION)/site-packages/geofun2$(EXTENSION_SUFFIX): $(WHEEL_NAME)
 	@echo "Installing: $@"
-	@if [ ! -f $(WHEEL_NAME) ]; then echo "Wheel doesn't exist. Do make again"; make; exit 0; else . venv/bin/activate; pip install $(WHEEL_NAME); fi
+	@if [ ! -f $(WHEEL_NAME) ]; then echo "Wheel doesn't exist. Do make again"; make; exit 0; else . venv/bin/activate; pip install --force-reinstall $(WHEEL_NAME); fi
 	@if [ -f "$@" ]; then touch "$@"; fi
 
 .PHONY: install
