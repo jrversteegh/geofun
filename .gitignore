@@ -1,0 +1,6 @@
+*.pyc
+*.log
+build
+/.env
+/venv
+/contrib/install
