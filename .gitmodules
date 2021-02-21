@@ -1,0 +1,4 @@
+[submodule "contrib/geographiclib"]
+	path = contrib/geographiclib
+	url = https://git.code.sf.net/u/jrversteegh/geographiclib
+	branch = release
