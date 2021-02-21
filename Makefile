@@ -21,12 +21,15 @@ contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
 	@mkdir -p contrib/install
 	@cd contrib/geographiclib/BUILD && make -j 4 install
 
+.PHONY: geographiclib
+geographiclib: contrib/install/lib/libGeographic.a
+
 $(WHEEL_NAME): venv/updated $(SOURCE) contrib/install/lib/libGeographic.a
 	@echo "Building: $(WHEEL_NAME) from $(SOURCE)"
 	@. venv/bin/activate; $(PYTHON) setup.py bdist_wheel
 
 .PHONY: build
-build: contrib/install/lib/libGeographic.a $(WHEEL_NAME)
+build: $(WHEEL_NAME)
 
 venv/lib/python$(PYTHON_VERSION)/site-packages/geofun2$(EXTENSION_SUFFIX): $(WHEEL_NAME)
 	@echo "Installing: $@"

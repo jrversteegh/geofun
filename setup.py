@@ -1,7 +1,10 @@
 from glob import glob
+import subprocess
 from setuptools import setup
 from setuptools.dist import Distribution
 from pybind11.setup_helpers import Pybind11Extension, build_ext
+
+subprocess.run(('make', 'geographiclib')
 
 dist = Distribution()
 dist.parse_config_files()
