@@ -11,5 +11,5 @@ Currently only building on linux is supported. You'll need `make` and `cmake`. W
 to run:
 
 `
-make package
+make build
 `

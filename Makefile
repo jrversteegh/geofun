@@ -1,3 +1,5 @@
+EXTENSION_SUFFIX := $(shell python3-config --extension-suffix)
+
 .PHONY: all
 all: $(ALL_TARGETS) test
 	
@@ -14,14 +16,19 @@ contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
 	@mkdir -p contrib/install
 	@cd contrib/geographiclib/BUILD && make -j 4 install
 
+build/geofun2$(EXTENSION_SUFFIX): packages
+	@which c++ >/dev/null || (echo "c++ is required to build" && exit 1)
+	@mkdir -p build
+	@. venv/bin/activate; c++ -O3 -Wall -shared -std=c++11 -fPIC -I contrib/install/include $(shell python3 -m pybind11 --includes) src/geofun2.cpp -o $@
+
 .PHONY: build
-build: contrib/install/lib/libGeographic.a
+build: contrib/install/lib/libGeographic.a build/geofun2$(EXTENSION_SUFFIX)
 
 .PHONY: install
 install: build
 
 .PHONY: test
-test: packages codestyle
+test: codestyle build
 	@echo "Running tests...."
 	@. venv/bin/activate; pytest -v tests
 	@echo "Done."

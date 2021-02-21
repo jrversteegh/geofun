@@ -9,7 +9,7 @@ import __main__ as main
 
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(scriptdir)
-_module_path = scriptdir + '/..'
+_module_path = scriptdir + '/../build'
 sys.path.insert(0, _module_path)
 
 logdir = scriptdir + '/logs'
