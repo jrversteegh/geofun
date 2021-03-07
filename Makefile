@@ -12,7 +12,7 @@ contrib/geographiclib/CMakeLists.txt:
 	@git submodule update --init
 
 contrib/geographiclib/BUILD/Makefile: contrib/geographiclib/CMakeLists.txt
-	@which cmake >/dev/null || (echo "cmake is required to build" && exit 1)
+	@which cmake >/dev/null || (echo "Error: cmake is required to build" && exit 1)
 	@mkdir -p contrib/geographiclib/BUILD
 	@cd contrib/geographiclib/BUILD && cmake -DCMAKE_INSTALL_PREFIX=../../install -DGEOGRAPHICLIB_LIB_TYPE=STATIC -DCMAKE_CXX_FLAGS=-fPIC ..
 
