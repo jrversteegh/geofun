@@ -2,6 +2,8 @@
 #include <cmath>
 #include <stdexcept>
 #include <vector>
+#include <string>
+#include <cstdlib>
 #include <initializer_list>
 
 #include <pybind11/pybind11.h>
@@ -59,7 +61,6 @@ inline bool float_smaller(const double value1, const double value2)
 {
   return value1 < value2 and not floats_equal(value1, value2);
 }
-
 
 
 std::string get_version() {
@@ -435,6 +436,10 @@ struct Position {
     set_latitude(initializer[0]);
     set_longitude(initializer[1]);
   }
+  Position(const std::string& latitude, const std::string& longitude): latitude_(), longitude_() {
+    set_latitude(std::strtof(latitude.c_str(), NULL));
+    set_longitude(std::strtof(longitude.c_str(), NULL));
+  }
   Position& operator=(const Position&) = default;
   Position& operator=(Position&&) = default;
 
@@ -651,9 +656,9 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::self + py::self)
     .def(py::self -= py::self)
     .def(py::self - py::self)
-    .def(py::self *= float())
-    .def(float() * py::self)
-    .def(py::self * float())
+    .def(py::self *= double())
+    .def(double() * py::self)
+    .def(py::self * double())
     .def(-py::self)
     ;
 
@@ -694,15 +699,15 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::self + py::self)
     .def(py::self -= py::self)
     .def(py::self - py::self)
-    .def(py::self *= float())
-    .def(float() * py::self)
-    .def(py::self * float())
-    .def(py::self += float())
-    .def(float() + py::self)
-    .def(py::self + float())
-    .def(py::self -= float())
-    .def(float() - py::self)
-    .def(py::self - float())
+    .def(py::self *= double())
+    .def(double() * py::self)
+    .def(py::self * double())
+    .def(py::self += double())
+    .def(double() + py::self)
+    .def(py::self + double())
+    .def(py::self -= double())
+    .def(double() - py::self)
+    .def(py::self - double())
     .def(-py::self)
     ;
 
@@ -717,6 +722,8 @@ PYBIND11_MODULE(geofun2, m) {
         "Construct position from seconds of angle.")
     .def(py::init<const std::vector<double>&>(),
         "Construct position from initializer list.")
+    .def(py::init<const std::string&, const std::string&>(),
+        "Construct position from pair of strings")
     .def("__getitem__", &Position::get_item)
     .def("__setitem__", &Position::set_item)
     .def("__len__", &Position::get_len)

@@ -125,11 +125,8 @@ def test_position(log):
     for i in range(10):
         pos2 *= v3
     pos1 = Position(45., 1.)
-    # No longer equal but off by less than 2mm
-    assert pos1 != pos2
-    assert (pos1 - pos2).length < 0.002
+    assert pos1 == pos2
 
-    # Keyword construction
     pos2 = Position(latitude=45, longitude=1)
     assert pos1 == pos2
 
