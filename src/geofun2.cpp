@@ -448,6 +448,28 @@ struct Position {
     return *this;
   }
 
+  Position& operator*=(const Vector& vector) {
+    static const Geodesic& geodesic = Geodesic::WGS84();
+    double latitude;
+    double longitude;
+    double azimuth;
+    geodesic.Direct(latitude_, longitude_, vector.azimuth_, vector.length_, latitude, longitude, azimuth);
+    latitude_ = latitude;
+    longitude_ = longitude;
+    return *this;
+  }
+
+  Position& operator/=(const Vector& vector) {
+    static const Geodesic& geodesic = Geodesic::WGS84();
+    double latitude;
+    double longitude;
+    double azimuth;
+    geodesic.Direct(latitude_, longitude_, vector.azimuth_, -vector.length_, latitude, longitude, azimuth);
+    latitude_ = latitude;
+    longitude_ = longitude;
+    return *this;
+  }
+
   Position operator+(const Vector& vector) const {
     Position result(*this);
     result += vector;
@@ -457,6 +479,18 @@ struct Position {
   Position operator-(const Vector& vector) const {
     Position result(*this);
     result -= vector;
+    return result;
+  }
+
+  Position operator*(const Vector& vector) const {
+    Position result(*this);
+    result *= vector;
+    return result;
+  }
+
+  Position operator/(const Vector& vector) const {
+    Position result(*this);
+    result /= vector;
     return result;
   }
 
@@ -555,10 +589,10 @@ PYBIND11_MODULE(geofun2, m) {
     .def_property("x", &Point::get_x, &Point::set_x)
     .def_property("y", &Point::get_y, &Point::set_y)
     .def(py::self == py::self)
-    .def(py::self + py::self)
     .def(py::self += py::self)
-    .def(py::self - py::self)
+    .def(py::self + py::self)
     .def(py::self -= py::self)
+    .def(py::self - py::self)
     .def(py::self *= float())
     .def(float() * py::self)
     .def(py::self * float())
@@ -572,10 +606,10 @@ PYBIND11_MODULE(geofun2, m) {
     .def_property("azimuth", &Vector::get_azimuth, &Vector::set_azimuth)
     .def_property("length", &Vector::get_length, &Vector::set_length)
     .def(py::self == py::self)
-    .def(py::self + py::self)
     .def(py::self += py::self)
-    .def(py::self - py::self)
+    .def(py::self + py::self)
     .def(py::self -= py::self)
+    .def(py::self - py::self)
     .def(py::self *= float())
     .def(float() * py::self)
     .def(py::self * float())
@@ -595,10 +629,14 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::self == py::self)
     .def(py::self - py::self)
     .def(py::self / py::self)
-    .def(py::self + Vector())
     .def(py::self += Vector())
-    .def(py::self - Vector())
+    .def(py::self + Vector())
     .def(py::self -= Vector())
+    .def(py::self - Vector())
+    .def(py::self *= Vector())
+    .def(py::self * Vector())
+    .def(py::self /= Vector())
+    .def(py::self / Vector())
     ;
 }
 
