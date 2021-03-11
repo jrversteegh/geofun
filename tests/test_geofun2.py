@@ -87,9 +87,20 @@ def test_vector():
     with pytest.raises(IndexError):
         v3[2]
     assert copy(v3) == v3.copy()
+    assert v3.norm().length == 1
+    assert v3.norm().azimuth == 45
+    v4 = Vector(270, -1)
+    assert v4.azimuth == pytest.approx(90)
+    assert v4.length == pytest.approx(1)
+    assert v3.dot(v4) == pytest.approx(1)
+    assert v3.dot(v4) == pytest.approx(v3.x * v4.x + v3.y * v4.y)
+    assert v3.cross(v4) == pytest.approx(1)
+    assert v3.cross(v4) == pytest.approx(v3.x * v4.y - v4.x * v3.y)
 
 
 def test_position(log):
+    # Dubious feature: automatic construction from seconds
+    assert Position(1, 1) != Position(1., 1.)
     pos1 = Position(45., 1.)
     assert pos1.latitude == pytest.approx(45)
     assert pos1.longitude == pytest.approx(1)
@@ -113,6 +124,10 @@ def test_position(log):
     # No longer equal but off by less than 2mm
     assert pos1 != pos2
     assert (pos1 - pos2).length < 0.002
+
+    # Keyword construction
+    pos2 = Position(latitude=45, longitude=1)
+    assert pos1 == pos2
 
     pos2 = pos1 + Vector(90, 40E3)
     assert pos2[1] == pytest.approx(1.507312689879)

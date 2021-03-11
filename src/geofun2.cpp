@@ -216,7 +216,10 @@ struct Vector {
   Vector() = default;
   Vector(const Vector&) = default;
   Vector(Vector&&) = default;
-  Vector(const double azimuth, const double length): azimuth_(angle_mod(azimuth)), length_(length) {}
+  Vector(const double azimuth, const double length): azimuth_(), length_() {
+    set_azimuth(azimuth);
+    set_length(length);
+  }
   Vector(const Point& point): azimuth_(), length_() {
     set_x_y(point.x_, point.y_);
   }
@@ -237,7 +240,14 @@ struct Vector {
   }
 
   Vector& set_length(const double length) {
-    length_ = length;
+    // Prefer a positive length
+    if (length < 0) {
+      set_azimuth(azimuth_ + 180.0);
+      length_ = -length;
+    }
+    else {
+      length_ = length;
+    }
     return *this;
   }
 
@@ -282,23 +292,26 @@ struct Vector {
   }
 
   Vector& operator+=(const double angle) {
-    azimuth_ = angle_mod(azimuth_ + angle);
-    return *this;
+    return set_azimuth(azimuth_ + angle);
   }
 
   Vector& operator-=(const double angle) {
-    azimuth_ = angle_mod(azimuth_ - angle);
-    return *this;
+    return set_azimuth(azimuth_ - angle);
   }
 
   Vector& operator*=(const double multiplier) {
-    length_ *= multiplier;
-    return *this;
+    return set_length(length_ * multiplier);
   }
 
   Vector operator+(const Vector& vector) const {
     Vector result(*this);
     result += vector;
+    return result;
+  }
+
+  Vector operator-(const Vector& vector) const {
+    Vector result(*this);
+    result -= vector;
     return result;
   }
 
@@ -308,9 +321,9 @@ struct Vector {
     return result;
   }
 
-  Vector operator-(const Vector& vector) const {
+  Vector operator-(const double angle) const {
     Vector result(*this);
-    result -= vector;
+    result -= angle;
     return result;
   }
 
@@ -379,6 +392,10 @@ Vector operator*(const double multiplier, const Vector& vector) {
 
 Vector operator+(const double angle, const Vector& vector) {
   return vector.operator+(angle);
+}
+
+Vector operator-(const double angle, const Vector& vector) {
+  return -vector.operator+(angle);
 }
 
 
@@ -585,12 +602,12 @@ PYBIND11_MODULE(geofun2, m) {
   py::class_<Point>(m, "Point")
     .def(py::init<>())
     .def(py::init<Point&>())
-    .def(py::init<const double, const double>())
+    .def(py::init<const double, const double>(), "x"_a, "y"_a)
     .def("__getitem__", &Point::get_item)
     .def("__setitem__", &Point::set_item)
     .def("__len__", &Point::get_len)
     .def("__copy__", [](const Point& self) { return Point(self); })
-    .def("__deepcopy__", [](const Point& self, py::dict) { return Point(self); }, "memo"_a) 
+    .def("__deepcopy__", [](const Point& self, py::dict) { return Point(self); }, "memo"_a)
     .def("copy", [](const Position& self) { return Position(self); })
     .def_property("x", &Point::get_x, &Point::set_x)
     .def_property("y", &Point::get_y, &Point::set_y)
@@ -608,13 +625,16 @@ PYBIND11_MODULE(geofun2, m) {
   py::class_<Vector>(m, "Vector")
     .def(py::init<>())
     .def(py::init<Vector&>())
-    .def(py::init<const double, const double>())
+    .def(py::init<const double, const double>(), "azimuth"_a, "length"_a)
     .def("__getitem__", &Vector::get_item)
     .def("__setitem__", &Vector::set_item)
     .def("__len__", &Vector::get_len)
     .def("__copy__", [](const Vector& self) { return Vector(self); })
-    .def("__deepcopy__", [](const Vector& self, py::dict) { return Vector(self); }, "memo"_a) 
+    .def("__deepcopy__", [](const Vector& self, py::dict) { return Vector(self); }, "memo"_a)
     .def("copy", [](const Vector& self) { return Vector(self); })
+    .def("norm", &Vector::norm)
+    .def("dot", &Vector::dot)
+    .def("cross", &Vector::cross)
     .def_property("azimuth", &Vector::get_azimuth, &Vector::set_azimuth)
     .def_property("length", &Vector::get_length, &Vector::set_length)
     .def_property("x", &Vector::get_x, &Vector::set_x)
@@ -630,19 +650,22 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::self += float())
     .def(float() + py::self)
     .def(py::self + float())
+    .def(py::self -= float())
+    .def(float() - py::self)
+    .def(py::self - float())
     .def(-py::self)
     ;
 
   py::class_<Position>(m, "Position")
     .def(py::init<>())
     .def(py::init<Position&>())
-    .def(py::init<const double, const double>())
-    .def(py::init<const int, const int>())
+    .def(py::init<const double, const double>(), "latitude"_a, "longitude"_a)
+    .def(py::init<const int, const int>(), "latitude_seconds"_a, "longitude_seconds"_a)
     .def("__getitem__", &Position::get_item)
     .def("__setitem__", &Position::set_item)
     .def("__len__", &Position::get_len)
     .def("__copy__", [](const Position& self) { return Position(self); })
-    .def("__deepcopy__", [](const Position& self, py::dict) { return Position(self); }, "memo"_a) 
+    .def("__deepcopy__", [](const Position& self, py::dict) { return Position(self); }, "memo"_a)
     .def("copy", [](const Position& self) { return Position(self); })
     .def("__len__", &Position::get_len)
     .def_property("latitude", &Position::get_latitude, &Position::set_latitude)
