@@ -77,12 +77,20 @@ def test_vector():
     v2 = Vector(90, 1)
     v3 = v1 + v2
     assert v3.azimuth == pytest.approx(45)
+    assert v3[0] == v3.azimuth
+    assert v3[-2] == v3.azimuth
+    assert v3[1] == v3.length
+    assert v3[-1] == v3.length
+    with pytest.raises(IndexError):
+        v3[2]
 
 
 def test_position(log):
     pos1 = Position(45., 1.)
     assert pos1.latitude == pytest.approx(45)
     assert pos1.longitude == pytest.approx(1)
+    assert pos1.latitude == pos1[0]
+    assert pos1.longitude == pos1[1]
     pos2 = Position(44 * 3600, 3600)
     assert pos2.latitude == pytest.approx(44)
     assert pos2.longitude == pytest.approx(1)
@@ -102,5 +110,10 @@ def test_position(log):
     assert pos1 != pos2
     diff = pos1 - pos2
     assert diff.length < 0.002
+    pos2 = pos1 + Vector(90, 40E3)
+    assert pos2[1] == pytest.approx(1.507312689879)
+    pos2[1] = 358
+    assert pos2.longitude == -2
+
     v = Vector(45, 100000)
     assert pos1 / v == pos1 * -v

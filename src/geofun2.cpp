@@ -191,7 +191,7 @@ struct Point {
     }
   }
 
-  constexpr int len() const {
+  constexpr int get_len() const {
     return 2;
   }
 
@@ -358,7 +358,7 @@ struct Vector {
     }
   }
 
-  constexpr int len() const {
+  constexpr int get_len() const {
     return 2;
   }
 
@@ -512,7 +512,7 @@ struct Position {
     }
   }
 
-  constexpr int len() const {
+  constexpr int get_len() const {
     return 2;
   }
 
@@ -586,6 +586,9 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::init<>())
     .def(py::init<Point&>())
     .def(py::init<const double, const double>())
+    .def("__getitem__", &Point::get_item)
+    .def("__setitem__", &Point::set_item)
+    .def("__len__", &Point::get_len)
     .def_property("x", &Point::get_x, &Point::set_x)
     .def_property("y", &Point::get_y, &Point::set_y)
     .def(py::self == py::self)
@@ -603,6 +606,9 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::init<>())
     .def(py::init<Vector&>())
     .def(py::init<const double, const double>())
+    .def("__getitem__", &Vector::get_item)
+    .def("__setitem__", &Vector::set_item)
+    .def("__len__", &Vector::get_len)
     .def_property("azimuth", &Vector::get_azimuth, &Vector::set_azimuth)
     .def_property("length", &Vector::get_length, &Vector::set_length)
     .def(py::self == py::self)
@@ -624,6 +630,9 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::init<Position&>())
     .def(py::init<const double, const double>())
     .def(py::init<const int, const int>())
+    .def("__getitem__", &Position::get_item)
+    .def("__setitem__", &Position::set_item)
+    .def("__len__", &Position::get_len)
     .def_property("latitude", &Position::get_latitude, &Position::set_latitude)
     .def_property("longitude", &Position::get_longitude, &Position::set_longitude)
     .def(py::self == py::self)
@@ -639,4 +648,3 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::self / Vector())
     ;
 }
-
