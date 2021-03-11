@@ -2,6 +2,7 @@
 
 import os
 import pytest
+from copy import copy
 
 try:
     import conftest
@@ -81,8 +82,11 @@ def test_vector():
     assert v3[-2] == v3.azimuth
     assert v3[1] == v3.length
     assert v3[-1] == v3.length
+    v3.x == pytest.approx(1)
+    v3.y == pytest.approx(1)
     with pytest.raises(IndexError):
         v3[2]
+    assert copy(v3) == v3.copy()
 
 
 def test_position(log):
@@ -108,8 +112,8 @@ def test_position(log):
     pos1 = Position(45., 1.)
     # No longer equal but off by less than 2mm
     assert pos1 != pos2
-    diff = pos1 - pos2
-    assert diff.length < 0.002
+    assert (pos1 - pos2).length < 0.002
+
     pos2 = pos1 + Vector(90, 40E3)
     assert pos2[1] == pytest.approx(1.507312689879)
     pos2[1] = 358
