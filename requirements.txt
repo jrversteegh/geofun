@@ -2,3 +2,4 @@ setuptools
 pybind11
 pytest
 flake8
+numpy

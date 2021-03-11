@@ -12,7 +12,18 @@ from geofun2 import *
 
 
 def test_version():
-    assert get_version() == "0.0.1"
+    assert get_version() == "0.0.2"
+
+
+def test_angle_mod():
+    assert angle_mod(0) == 0
+    assert angle_mod(720) == 0
+    assert angle_mod(630) == 270
+    assert angle_mod(-90) == 270
+    assert angle_mod_signed(0) == 0
+    assert angle_mod_signed(720) == 0
+    assert angle_mod_signed(630) == -90
+    assert angle_mod_signed(-90) == -90
 
 
 def test_rhumb_direct(log):
@@ -45,3 +56,39 @@ def test_geodesic_inverse(log):
     assert azi1 == pytest.approx(45., abs=1E-8)
     assert azi2 == pytest.approx(45.0812835607, abs=1E-8)
     assert dist == pytest.approx(10000, abs=1E-4)
+
+
+def test_point():
+    p1 = Point(1, 8.88)
+    assert p1.x == pytest.approx(1.0)
+    assert p1.y == pytest.approx(8.88)
+    p2 = Point(p1)
+    p1.x = 2.0
+    assert p2.x == pytest.approx(1.0)
+    assert p2.y == pytest.approx(8.88)
+    p3 = Point(-1, 1.11)
+    p4 = p2 + p3
+    assert p4.x == pytest.approx(0.0)
+    assert p4.y == pytest.approx(9.99)
+
+
+def test_vector():
+    v1 = Vector(0, 1)
+    v2 = Vector(90, 1)
+    v3 = v1 + v2
+    assert v3.azimuth == pytest.approx(45)
+
+
+def test_position():
+    pos1 = Position(45., 1.)
+    assert pos1.latitude == pytest.approx(45)
+    assert pos1.longitude == pytest.approx(1)
+    pos2 = Position(44 * 3600, 3600)
+    assert pos2.latitude == pytest.approx(44)
+    assert pos2.longitude == pytest.approx(1)
+    v1 = pos2 - pos1
+    v2 = pos2 / pos1
+    assert v1.azimuth == pytest.approx(180)
+    assert v2.azimuth == pytest.approx(180)
+    assert v1.length == pytest.approx(60 * 1852, abs=3.)
+    assert v2.length == pytest.approx(60 * 1852, abs=3.)
