@@ -1,8 +1,11 @@
 #include <string>
 #include <cmath>
 #include <stdexcept>
+#include <vector>
+#include <initializer_list>
 
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 #include <pybind11/numpy.h>
 #include <pybind11/operators.h>
 
@@ -108,6 +111,13 @@ struct Point {
   Point(const Point&) = default;
   Point(Point&&) = default;
   Point(const double x, const double y): x_(x), y_(y) {}
+  Point(const std::vector<double>& initializer) {
+    if (initializer.size() != 2) {
+      throw std::out_of_range("Initializer length isn't 2 in construction of point");
+    }
+    set_x(initializer[0]);
+    set_y(initializer[1]);
+  }
   Point& operator=(const Point&) = default;
   Point& operator=(Point&&) = default;
 
@@ -222,6 +232,13 @@ struct Vector {
   }
   Vector(const Point& point): azimuth_(), length_() {
     set_x_y(point.x_, point.y_);
+  }
+  Vector(const std::vector<double>& initializer) {
+    if (initializer.size() != 2) {
+      throw std::out_of_range("Initializer length isn't 2 in construction of vector");
+    }
+    set_azimuth(initializer[0]);
+    set_length(initializer[1]);
   }
   Vector& operator=(const Vector&) = default;
   Vector& operator=(Vector&&) = default;
@@ -411,6 +428,13 @@ struct Position {
     set_latitude_seconds(latitude);
     set_longitude_seconds(longitude);
   }
+  Position(const std::vector<double>& initializer) {
+    if (initializer.size() != 2) {
+      throw std::out_of_range("Initializer length isn't 2 in construction of position");
+    }
+    set_latitude(initializer[0]);
+    set_longitude(initializer[1]);
+  }
   Position& operator=(const Position&) = default;
   Position& operator=(Position&&) = default;
 
@@ -594,23 +618,34 @@ PYBIND11_MODULE(geofun2, m) {
       "Get starting azimuth, distance and ending azimuth of great circle between positions");
 
   // Angle arithmetic
-  m.def("angle_mod", py::vectorize(angle_mod), "Return angle bound to [0.0, 360.0>");
-  m.def("angle_mod_signed", py::vectorize(angle_mod_signed), "Return angle bound to [-180.0, 180.0>");
-  m.def("angle_diff", py::vectorize(angle_diff), "Signed difference between to angles");
+  m.def("angle_mod", py::vectorize(angle_mod),
+      "Return angle bound to [0.0, 360.0>");
+  m.def("angle_mod_signed", py::vectorize(angle_mod_signed),
+      "Return angle bound to [-180.0, 180.0>");
+  m.def("angle_diff", py::vectorize(angle_diff),
+      "Signed difference between to angles");
 
   // Primitives
   py::class_<Point>(m, "Point")
-    .def(py::init<>())
-    .def(py::init<Point&>())
-    .def(py::init<const double, const double>(), "x"_a, "y"_a)
+    .def(py::init<>(),
+        "Construct new point.")
+    .def(py::init<Point&>(),
+        "Copy construct point.")
+    .def(py::init<const double, const double>(), "x"_a, "y"_a,
+        "Construct point from coordinate pair x, y.")
+    .def(py::init<const std::vector<double>&>(),
+        "Construct point from initializer list.")
     .def("__getitem__", &Point::get_item)
     .def("__setitem__", &Point::set_item)
     .def("__len__", &Point::get_len)
     .def("__copy__", [](const Point& self) { return Point(self); })
     .def("__deepcopy__", [](const Point& self, py::dict) { return Point(self); }, "memo"_a)
-    .def("copy", [](const Position& self) { return Position(self); })
-    .def_property("x", &Point::get_x, &Point::set_x)
-    .def_property("y", &Point::get_y, &Point::set_y)
+    .def("copy", [](const Position& self) { return Position(self); },
+        "Return a copy of this point.")
+    .def_property("x", &Point::get_x, &Point::set_x,
+        "X coordinate of point.")
+    .def_property("y", &Point::get_y, &Point::set_y,
+        "Y coordinate of point.")
     .def(py::self == py::self)
     .def(py::self += py::self)
     .def(py::self + py::self)
@@ -623,22 +658,37 @@ PYBIND11_MODULE(geofun2, m) {
     ;
 
   py::class_<Vector>(m, "Vector")
-    .def(py::init<>())
-    .def(py::init<Vector&>())
-    .def(py::init<const double, const double>(), "azimuth"_a, "length"_a)
+    .def(py::init<>(),
+        "Construct new vector.")
+    .def(py::init<Vector&>(),
+        "Copy construct vector.")
+    .def(py::init<const double, const double>(), "azimuth"_a, "length"_a,
+        "Construct vector from pair of azimuth and length.")
+    .def(py::init<const std::vector<double>&>(),
+        "Construct vector from initializer list.")
     .def("__getitem__", &Vector::get_item)
     .def("__setitem__", &Vector::set_item)
     .def("__len__", &Vector::get_len)
     .def("__copy__", [](const Vector& self) { return Vector(self); })
     .def("__deepcopy__", [](const Vector& self, py::dict) { return Vector(self); }, "memo"_a)
-    .def("copy", [](const Vector& self) { return Vector(self); })
-    .def("norm", &Vector::norm)
-    .def("dot", &Vector::dot)
-    .def("cross", &Vector::cross)
-    .def_property("azimuth", &Vector::get_azimuth, &Vector::set_azimuth)
-    .def_property("length", &Vector::get_length, &Vector::set_length)
-    .def_property("x", &Vector::get_x, &Vector::set_x)
-    .def_property("y", &Vector::get_y, &Vector::set_y)
+    .def("copy", [](const Vector& self) { return Vector(self); },
+        "Return a copy of this vector.")
+    .def("norm", &Vector::norm,
+        "Return a copy of this vector with a lenght of 1.")
+    .def("dot", &Vector::dot, "other"_a,
+        "Return the dot product of this vector with \"other\".")
+    .def("cross", &Vector::cross, "other"_a,
+        "Return the cross product of this vector with \"other\".")
+    .def("point", &Vector::point,
+        "Return copy of vector as Point with x, y coordinates.")
+    .def_property("azimuth", &Vector::get_azimuth, &Vector::set_azimuth,
+        "Azimuth of vector")
+    .def_property("length", &Vector::get_length, &Vector::set_length,
+        "Length of vector")
+    .def_property("x", &Vector::get_x, &Vector::set_x,
+        "X component of vector")
+    .def_property("y", &Vector::get_y, &Vector::set_y,
+        "Y component of vector")
     .def(py::self == py::self)
     .def(py::self += py::self)
     .def(py::self + py::self)
@@ -657,10 +707,16 @@ PYBIND11_MODULE(geofun2, m) {
     ;
 
   py::class_<Position>(m, "Position")
-    .def(py::init<>())
-    .def(py::init<Position&>())
-    .def(py::init<const double, const double>(), "latitude"_a, "longitude"_a)
-    .def(py::init<const int, const int>(), "latitude_seconds"_a, "longitude_seconds"_a)
+    .def(py::init<>(),
+        "Construct new position.")
+    .def(py::init<Position&>(),
+        "Copy construct position.")
+    .def(py::init<const double, const double>(), "latitude"_a, "longitude"_a,
+        "Construct position from decimal degrees of angle.")
+    .def(py::init<const int, const int>(), "lat_seconds"_a, "lon_seconds"_a,
+        "Construct position from seconds of angle.")
+    .def(py::init<const std::vector<double>&>(),
+        "Construct position from initializer list.")
     .def("__getitem__", &Position::get_item)
     .def("__setitem__", &Position::set_item)
     .def("__len__", &Position::get_len)
@@ -668,8 +724,10 @@ PYBIND11_MODULE(geofun2, m) {
     .def("__deepcopy__", [](const Position& self, py::dict) { return Position(self); }, "memo"_a)
     .def("copy", [](const Position& self) { return Position(self); })
     .def("__len__", &Position::get_len)
-    .def_property("latitude", &Position::get_latitude, &Position::set_latitude)
-    .def_property("longitude", &Position::get_longitude, &Position::set_longitude)
+    .def_property("latitude", &Position::get_latitude, &Position::set_latitude,
+        "Latitude of position")
+    .def_property("longitude", &Position::get_longitude, &Position::set_longitude,
+        "Longitude of position")
     .def(py::self == py::self)
     .def(py::self - py::self)
     .def(py::self / py::self)

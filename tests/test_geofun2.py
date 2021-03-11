@@ -61,6 +61,10 @@ def test_geodesic_inverse(log):
 
 def test_point():
     p1 = Point(1, 8.88)
+    p2 = Point((1, 8.88))
+    p3 = Point([1, 8.88])
+    assert p2 == p1
+    assert p3 == p1
     assert p1.x == pytest.approx(1.0)
     assert p1.y == pytest.approx(8.88)
     p2 = Point(p1)
