@@ -52,7 +52,7 @@ inline bool floats_equal(const double value1, const double value2)
   double absmax = std::max(abs1, abs2);
   double eps = 1E-13;
   // Get relative eps value except for values very close to zero
-  if (absmax > 1E-6) {
+  if (absmax > 1E-7) {
     eps *= absmax;
   }
   return std::fabs(value1 - value2) < eps;
@@ -174,6 +174,13 @@ struct Point {
 
   bool operator==(const Point& point) const {
     return floats_equal(x_, point.x_) && floats_equal(y_, point.y_);
+  }
+
+  bool operator==(const std::vector<double>& other) const {
+    if (other.size() != 2) {
+      throw std::out_of_range(fmt::format("Can't compare Point to container of size {}", other.size()));
+    }
+    return floats_equal(get_x(), other[0]) && floats_equal(get_y(), other[1]);
   }
 
   Point& operator+=(const Point& point) {
@@ -343,6 +350,16 @@ struct Vector {
     return floats_equal(azimuth_, vector.azimuth_) && floats_equal(length_, vector.length_);
   }
 
+  bool operator==(const Point& point) const {
+    return floats_equal(get_x(), point.get_x()) && floats_equal(get_y(), point.get_y());
+  }
+
+  bool operator==(const std::vector<double>& other) const {
+    if (other.size() != 2) {
+      throw std::out_of_range(fmt::format("Can't compare Vector to container of size {}", other.size()));
+    }
+    return floats_equal(get_azimuth(), other[0]) && floats_equal(get_length(), other[1]);
+  }
 
   Vector& operator+=(const Vector& vector) {
     set_x_y(get_x() + vector.get_x(), get_y() + vector.get_y());
@@ -461,6 +478,9 @@ private:
   double length_;
 };
 
+bool operator==(const Point& point, const Vector& vector) {
+  return vector.operator==(point);
+}
 
 Vector operator*(const double multiplier, const Vector& vector) {
   return vector.operator*(multiplier);
@@ -583,6 +603,13 @@ struct Position {
 
   bool operator==(const Position& position) const {
     return floats_equal(latitude_, position.latitude_) && floats_equal(longitude_, position.longitude_);
+  }
+
+  bool operator==(const std::vector<double>& other) const {
+    if (other.size() != 2) {
+      throw std::out_of_range(fmt::format("Can't compare Position to container of size {}", other.size()));
+    }
+    return floats_equal(get_latitude(), other[0]) && floats_equal(get_longitude(), other[1]);
   }
 
   Position& operator+=(const Vector& vector) {
@@ -778,6 +805,8 @@ PYBIND11_MODULE(geofun2, m) {
     .def_property("y", &Point::get_y, &Point::set_y,
         "Y coordinate of point.")
     .def(py::self == py::self)
+    .def(py::self == Vector())
+    .def(py::self == std::vector<double>())
     .def(py::self += py::self)
     .def(py::self + py::self)
     .def(py::self -= py::self)
@@ -823,6 +852,8 @@ PYBIND11_MODULE(geofun2, m) {
     .def_property("y", &Vector::get_y, &Vector::set_y,
         "Y component of vector")
     .def(py::self == py::self)
+    .def(py::self == Point())
+    .def(py::self == std::vector<double>())
     .def(py::self += py::self)
     .def(py::self + py::self)
     .def(py::self -= py::self)
@@ -866,6 +897,7 @@ PYBIND11_MODULE(geofun2, m) {
     .def_property("longitude", &Position::get_longitude, &Position::set_longitude,
         "Longitude of position")
     .def(py::self == py::self)
+    .def(py::self == std::vector<double>())
     .def(py::self - py::self)
     .def(py::self / py::self)
     .def(py::self += Vector())

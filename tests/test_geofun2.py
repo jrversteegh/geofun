@@ -9,6 +9,7 @@ try:
 except ImportError:
     from . import conftest
 
+import numpy as np
 from geofun2 import *
 
 
@@ -179,3 +180,28 @@ def test_repr_and_str(log):
     v = Vector(45, 88)
     assert str(v) == '45.000, 88.000'
     assert repr(v) == 'Vector(45.0, 88.0)'
+
+
+def test_comparison(log):
+    p = Point(3.131313, 5.151515)
+    v = Vector(45, 88)
+    pos = Position('-89°30.5S 00°00.50')
+    assert p == (3.131313, 5.151515)
+    assert (3.131313, 5.151515) == p
+    assert v == (45., 88.)
+    assert pos == (89.50833333333, 0.008333333333333)
+    p = v.point()
+    assert p.x == pytest.approx(62.2253967)
+    assert p.y == pytest.approx(62.2253967)
+    # Test comparison reversal
+    assert v == p
+    assert p == v
+
+    # Test numpy array comparison
+    assert v == [45, 88]
+    assert v == np.array([45, 88])
+    assert v == np.array([45, 88]).T
+    assert (np.array([45, 88]).T == v).all()
+    p = Point(3.131313, 5.151515)
+    assert p == np.array([3.131313, 5.151515])
+    assert np.isclose(np.array([3.131313, 5.151515]), p).all()
