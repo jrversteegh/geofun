@@ -63,6 +63,36 @@ inline bool float_smaller(const double value1, const double value2)
 }
 
 
+inline bool scan_floats(std::vector<double>& values, const std::string input) {
+  const char* s = input.c_str();
+  int result = true;
+
+  // Scan if the string only contains integral values
+  int i = 0;
+  char c;
+  while ((c = s[i++]) != '\0') {
+    if (!(isspace(c) || isdigit(c) || (c == '-'))) {
+      result = false;
+      break;
+    }
+  }
+
+  // Now scan the string for floats
+  while (*s != '\0') {
+    char* e;
+    double f = std::strtof(s, &e);
+    if (e == s) {
+      ++e;
+    }
+    else {
+      values.push_back(f);
+    }
+    s = e;
+  }
+  return result;
+}
+
+
 std::string get_version() {
   return VERSION;
 }
@@ -418,28 +448,81 @@ Vector operator-(const double angle, const Vector& vector) {
 
 
 struct Position {
+
   Position() = default;
   Position(const Position&) = default;
   Position(Position&&) = default;
+
   Position(const double latitude, const double longitude): latitude_(), longitude_() {
     set_latitude(latitude);
     set_longitude(longitude);
   }
+
   Position(const int latitude, const int longitude): latitude_(), longitude_() {
     set_latitude_seconds(latitude);
     set_longitude_seconds(longitude);
   }
+
   Position(const std::vector<double>& initializer) {
     if (initializer.size() != 2) {
-      throw std::out_of_range("Initializer length isn't 2 in construction of position");
+      throw std::out_of_range("Initializer length isn't 2 in construction of Position");
     }
     set_latitude(initializer[0]);
     set_longitude(initializer[1]);
   }
+
   Position(const std::string& latitude, const std::string& longitude): latitude_(), longitude_() {
-    set_latitude(std::strtof(latitude.c_str(), NULL));
-    set_longitude(std::strtof(longitude.c_str(), NULL));
+    std::vector<double> values;
+    bool is_integral = scan_floats(values, latitude);
+    is_integral &= scan_floats(values, longitude);
+    int val_count = values.size();
+    int i_count = val_count / 2;
+    if ((val_count == 0) || (val_count % 2) || (i_count > 3)) {
+      throw std::invalid_argument("Invalid argument count for Position");
+    }
+    size_t pos_N = latitude.find('N');
+    size_t pos_S = latitude.find('S');
+    bool is_south = pos_S != std::string::npos;
+    bool single = longitude == "";
+    size_t pos_E = single ? latitude.find('E') : longitude.find('E');
+    size_t pos_W = single ? latitude.find('W') : longitude.find('W');
+    bool is_west = pos_W != std::string::npos;
+    size_t pos_la = std::min(pos_N, pos_S);
+    size_t pos_lo = std::min(pos_E, pos_W);
+    bool reversed = single ? pos_lo < pos_la : false;
+
+    int offset = reversed ? i_count : 0;
+    double value = values[offset];
+    double lat = is_south ? -value : value;
+    double mult = std::signbit(lat) ? (-1.0 / 60.0) : (1.0 / 60.0);
+    int i = 1;
+    while (i < i_count) {
+      value = values[offset + i++];
+      lat += value * mult;
+      mult /= 60.0;
+    }
+
+    offset = reversed ? 0 : i_count;
+    value = values[offset];
+    double lon = is_west ? -value : value;
+    mult = std::signbit(lon) ? (-1.0 / 60.0) : (1.0 / 60.0);
+    i = 1;
+    while (i < i_count) {
+      value = values[offset + i++];
+      lon += value * mult;
+      mult /= 60.0;
+    }
+
+    if (is_integral) {
+      set_latitude_seconds(static_cast<int>(lat));
+      set_longitude_seconds(static_cast<int>(lon));
+    }
+    else {
+      set_latitude(lat);
+      set_longitude(lon);
+    }
   }
+
   Position& operator=(const Position&) = default;
   Position& operator=(Position&&) = default;
 
@@ -722,7 +805,7 @@ PYBIND11_MODULE(geofun2, m) {
         "Construct position from seconds of angle.")
     .def(py::init<const std::vector<double>&>(),
         "Construct position from initializer list.")
-    .def(py::init<const std::string&, const std::string&>(),
+    .def(py::init<const std::string&, const std::string&>(), "lat_string"_a, "lon_string"_a = "",
         "Construct position from pair of strings")
     .def("__getitem__", &Position::get_item)
     .def("__setitem__", &Position::set_item)

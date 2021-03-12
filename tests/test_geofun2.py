@@ -137,3 +137,27 @@ def test_position(log):
 
     v = Vector(45, 100000)
     assert pos1 / v == pos1 * -v
+
+
+def test_string_construction(log):
+    p = Position('52.1', '4.1')
+    assert p.latitude == pytest.approx(52.1)
+    assert p.longitude == pytest.approx(4.1)
+    p = Position('7200', '3600')
+    assert p.latitude == pytest.approx(2)
+    assert p.longitude == pytest.approx(1)
+    p = Position('7200 3600')
+    assert p.latitude == pytest.approx(2)
+    assert p.longitude == pytest.approx(1)
+    p = Position('4.1W 12.0N')
+    assert p.latitude == pytest.approx(12)
+    assert p.longitude == pytest.approx(-4.1)
+    p = Position('00°30\'00"S 00°30\'00W"')
+    assert p.latitude == pytest.approx(-0.5)
+    assert p.longitude == pytest.approx(-0.5)
+    p = Position('-00°00\'30" 00°00\'30"')
+    assert p.latitude == pytest.approx(-1. / 120.)
+    assert p.longitude == pytest.approx(1. / 120.)
+    p = Position('-89°30.5 00°00.50')
+    assert p.latitude == pytest.approx(-89 - 61. / 120.)
+    assert p.longitude == pytest.approx(1. / 120.)
