@@ -15,6 +15,8 @@
 #include <GeographicLib/Rhumb.hpp>
 #include <GeographicLib/Constants.hpp>
 
+#define FMT_HEADER_ONLY 1
+#include "fmt/format.h"
 #include "version.h"
 
 using namespace GeographicLib;
@@ -219,7 +221,7 @@ struct Point {
     switch(i) {
       case 0: return get_x();
       case 1: return get_y();
-      default: throw std::out_of_range("Index is out of range for Point");
+      default: throw std::out_of_range(fmt::format("Index {} is out of range for Point", i));
     }
   }
 
@@ -228,7 +230,7 @@ struct Point {
     switch(i) {
       case 0: return set_x(value);
       case 1: return set_y(value);
-      default: throw std::out_of_range("Index is out of range for Point");
+      default: throw std::out_of_range(fmt::format("Index {} is out of range for Point", i));
     }
   }
 
@@ -238,6 +240,19 @@ struct Point {
 
   double operator[](const int i) {
     return get_item(i);
+  }
+
+  std::string get_string() const {
+    return fmt::format("{:.3f}, {:.3f}", x_, y_);
+  }
+
+  std::string get_representation() const {
+    double i;
+    double x_frac = modf(x_, &i);
+    double y_frac = modf(y_, &i);
+    std::string format = x_frac == 0.0 ? "Point({:.1f}" : "Point({:.15g}";
+    format += y_frac == 0.0 ? ", {:.1f})" : ", {:.15g})";
+    return fmt::format(format, x_, y_);
   }
 
 private:
@@ -406,7 +421,7 @@ struct Vector {
     switch(i) {
       case 0: return get_azimuth();
       case 1: return get_length();
-      default: throw std::out_of_range("Index is out of range for Vector");
+      default: throw std::out_of_range(fmt::format("Index {} is out of range for Vector", i));
     }
   }
 
@@ -415,7 +430,7 @@ struct Vector {
     switch(i) {
       case 0: return set_azimuth(value);
       case 1: return set_length(value);
-      default: throw std::out_of_range("Index is out of range for Vector");
+      default: throw std::out_of_range(fmt::format("Index {} is out of range for Vector", i));
     }
   }
 
@@ -425,6 +440,19 @@ struct Vector {
 
   double operator[](const int i) {
     return get_item(i);
+  }
+
+  std::string get_string() const {
+    return fmt::format("{:.3f}, {:.3f}", azimuth_, length_);
+  }
+
+  std::string get_representation() const {
+    double i;
+    double x_frac = modf(azimuth_, &i);
+    double y_frac = modf(length_, &i);
+    std::string format = x_frac == 0.0 ? "Vector({:.1f}" : "Vector({:.15g}";
+    format += y_frac == 0.0 ? ", {:.1f})" : ", {:.15g})";
+    return fmt::format(format, azimuth_, length_);
   }
 
 private:
@@ -478,7 +506,7 @@ struct Position {
     int val_count = values.size();
     int i_count = val_count / 2;
     if ((val_count == 0) || (val_count % 2) || (i_count > 3)) {
-      throw std::invalid_argument("Invalid argument count for Position");
+      throw std::invalid_argument(fmt::format("Invalid argument count: {} for Position", val_count));
     }
     size_t pos_N = latitude.find('N');
     size_t pos_S = latitude.find('S');
@@ -628,7 +656,7 @@ struct Position {
     switch(i) {
       case 0: return get_latitude();
       case 1: return get_longitude();
-      default: throw std::out_of_range("Index is out of range for Position");
+      default: throw std::out_of_range(fmt::format("Index {} is out of range for Position", i));
     }
   }
 
@@ -637,7 +665,7 @@ struct Position {
     switch(i) {
       case 0: return set_latitude(value);
       case 1: return set_longitude(value);
-      default: throw std::out_of_range("Index is out of range for Position");
+      default: throw std::out_of_range(fmt::format("Index {} is out of range for Position", i));
     }
   }
 
@@ -647,6 +675,19 @@ struct Position {
 
   double operator[](const int i) {
     return get_item(i);
+  }
+
+  std::string get_string() const {
+    return fmt::format("{:.8f}, {:.8f}", latitude_, longitude_);
+  }
+
+  std::string get_representation() const {
+    double i;
+    double x_frac = modf(latitude_, &i);
+    double y_frac = modf(longitude_, &i);
+    std::string format = x_frac == 0.0 ? "Position({:.1f}" : "Position({:.15g}";
+    format += y_frac == 0.0 ? ", {:.1f})" : ", {:.15g})";
+    return fmt::format(format, latitude_, longitude_);
   }
 
 private:
@@ -726,9 +767,11 @@ PYBIND11_MODULE(geofun2, m) {
     .def("__getitem__", &Point::get_item)
     .def("__setitem__", &Point::set_item)
     .def("__len__", &Point::get_len)
+    .def("__str__", &Point::get_string)
+    .def("__repr__", &Point::get_representation)
     .def("__copy__", [](const Point& self) { return Point(self); })
     .def("__deepcopy__", [](const Point& self, py::dict) { return Point(self); }, "memo"_a)
-    .def("copy", [](const Position& self) { return Position(self); },
+    .def("copy", [](const Point& self) { return Point(self); },
         "Return a copy of this point.")
     .def_property("x", &Point::get_x, &Point::set_x,
         "X coordinate of point.")
@@ -757,6 +800,8 @@ PYBIND11_MODULE(geofun2, m) {
     .def("__getitem__", &Vector::get_item)
     .def("__setitem__", &Vector::set_item)
     .def("__len__", &Vector::get_len)
+    .def("__str__", &Vector::get_string)
+    .def("__repr__", &Vector::get_representation)
     .def("__copy__", [](const Vector& self) { return Vector(self); })
     .def("__deepcopy__", [](const Vector& self, py::dict) { return Vector(self); }, "memo"_a)
     .def("copy", [](const Vector& self) { return Vector(self); },
@@ -810,6 +855,8 @@ PYBIND11_MODULE(geofun2, m) {
     .def("__getitem__", &Position::get_item)
     .def("__setitem__", &Position::set_item)
     .def("__len__", &Position::get_len)
+    .def("__str__", &Position::get_string)
+    .def("__repr__", &Position::get_representation)
     .def("__copy__", [](const Position& self) { return Position(self); })
     .def("__deepcopy__", [](const Position& self, py::dict) { return Position(self); }, "memo"_a)
     .def("copy", [](const Position& self) { return Position(self); })

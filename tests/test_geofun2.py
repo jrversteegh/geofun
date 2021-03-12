@@ -161,3 +161,21 @@ def test_string_construction(log):
     p = Position('-89°30.5 00°00.50')
     assert p.latitude == pytest.approx(-89 - 61. / 120.)
     assert p.longitude == pytest.approx(1. / 120.)
+
+
+def test_repr_and_str(log):
+    p = Point(3.131313, 5.151515)
+    assert str(p) == '3.131, 5.152'
+    assert repr(p) == 'Point(3.131313, 5.151515)'
+    p = Point(300000.131313, 500000.151515)
+    assert str(p) == '300000.131, 500000.152'
+    assert repr(p) == 'Point(300000.131313, 500000.151515)'
+    p = Point(3, 5)
+    assert str(p) == '3.000, 5.000'
+    assert repr(p) == 'Point(3.0, 5.0)'
+    pos = Position('-89°30.5S 00°00.50')
+    assert str(pos) == '89.50833333, 0.00833333'
+    assert repr(pos) == 'Position(89.5083333333333, 0.00833333333333333)'
+    v = Vector(45, 88)
+    assert str(v) == '45.000, 88.000'
+    assert repr(v) == 'Vector(45.0, 88.0)'
