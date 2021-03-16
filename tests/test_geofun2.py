@@ -205,3 +205,11 @@ def test_comparison(log):
     p = Point(3.131313, 5.151515)
     assert p == np.array([3.131313, 5.151515])
     assert np.isclose(np.array([3.131313, 5.151515]), p).all()
+
+
+def test_numpy():
+    p1 = Point(3., 5.)
+    p2 = Point(3., 6.)
+    a = np.array([p1, p2])
+    assert (a == [[p1[0], p1[1]], [p2[0], p2[1]]]).all()
+    assert (a.T == [[p1[0], p2[0]], [p1[1], p2[1]]]).all()
