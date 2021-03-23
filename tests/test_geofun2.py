@@ -101,6 +101,9 @@ def test_vector():
     assert v3.dot(v4) == pytest.approx(v3.x * v4.x + v3.y * v4.y)
     assert v3.cross(v4) == pytest.approx(1)
     assert v3.cross(v4) == pytest.approx(v3.x * v4.y - v4.x * v3.y)
+    v5 = Vector(0., 2.)
+    v6 = Vector(30., 3.)
+    assert v5.cross(v6.norm()) == pytest.approx(1.)
 
 
 def test_position(log):
