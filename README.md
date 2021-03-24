@@ -23,35 +23,83 @@ git+https://github.com/jrversteegh/geofun2.git@master#egg=geofun2
 `pip install -r requirements.txt` should then automatically install geofun2 in your virtual environment.
 
 
+## Examples
+
+```python
+from geofun2 import Position, Vector
+
+# Just off Hoek van Holland
+org = Position(52.0, 4.0)
+nm95 = 95 * 1852.0
+
+# Go west 95 nm to Felixstowe
+rmbv = Vector(270.0, nm95)
+pos1 = org + rmbv
+
+# Go to the same point using great circle line
+gcv = pos1 / org
+pos2 = org * gcv
+
+# We should end up at the same location
+assert pos1 == pos2
+
+# How disappointing: we managed to gain just 9m by crossing the
+# North sea using a great circle :p
+assert nm95 - gcv.length == 9.101067085022805, f'Unexpected: {gcv.length}'
+
+print(f'From {org} to {pos1}')
+print(f'Rhumb: {rmbv}')
+print(f'Great circle: {gcv}')
+
+# Another verification
+assert pos1 - org == rmbv
+assert pos1 / org == gcv
+```
+
+## Classes
+
+Position
+ - latitude
+ - longitude
+
+Vector
+ - azimuth
+ - length
+
+Point
+ - x
+ - y
+
 ## Functions
 
-Output of `help(geofun2)`:
+`get_version() -> str`
 
-    NAME
-        geofun2 - Geographic utilities: orthodrome/loxodrome, geodesic/rhumb line evaluation.
+   Get the library version
 
-    FUNCTIONS
-        geodesic_direct(...) method of builtins.PyCapsule instance
-            geodesic_direct(latitude: float, longitude: float, azimuth: float, distance: float) -> tuple
+`geodesic_direct(latitude: float, longitude: float, azimuth: float, distance: float) -> tuple`
 
-            Get position and final azimuth after moving distance along great circle with starting azimuth
+   Get position and final azimuth after moving distance along great circle with starting azimuth
 
-        geodesic_inverse(...) method of builtins.PyCapsule instance
-            geodesic_inverse(latitude: float, longitude: float, azimuth: float, distance: float) -> tuple
+`geodesic_inverse(latitude: float, longitude: float, azimuth: float, distance: float) -> tuple`
 
-            Get starting azimuth, distance and ending azimuth of great circle between positions
+   Get starting azimuth, distance and ending azimuth of great circle between positions
 
-        get_version(...) method of builtins.PyCapsule instance
-            get_version() -> str
+`rhumb_direct(latitude: float, longitude: float, azimuth: float, distance: float) -> tuple`
 
-            Get the library version
+   Get position and final azimuth after moving distance from starting position at fixed azimuth/along rhumb line
 
-        rhumb_direct(...) method of builtins.PyCapsule instance
-            rhumb_direct(latitude: float, longitude: float, azimuth: float, distance: float) -> tuple
+`rhumb_inverse(latitude1: float, longitude1: float, latitude2: float, longitude2: float) -> tuple`
 
-            Get position and final azimuth after moving distance from starting position at fixed azimuth/along rhumb line
+   Get rhumb line azimuth, distance and final azimuth between positions
 
-        rhumb_inverse(...) method of builtins.PyCapsule instance
-            rhumb_inverse(latitude1: float, longitude1: float, latitude2: float, longitude2: float) -> tuple
+`angle_diff(arg0: numpy.ndarray[numpy.float64], arg1: numpy.ndarray[numpy.float64]) -> object`
 
-            Get rhumb line azimuth, distance and final azimuth between positions
+   Signed difference between to angles
+
+`angle_mod(arg0: numpy.ndarray[numpy.float64]) -> object`
+
+   Return angle bound to [0.0, 360.0>
+
+`angle_mod_signed(arg0: numpy.ndarray[numpy.float64]) -> object`
+
+   Return angle bound to [-180.0, 180.0>
