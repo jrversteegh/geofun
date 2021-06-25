@@ -815,6 +815,17 @@ PYBIND11_MODULE(geofun2, m) {
     .def(double() * py::self)
     .def(py::self * double())
     .def(-py::self)
+    .def(py::pickle(
+      [](const Point& p) {
+        return py::make_tuple(p.get_x(), p.get_y());
+      },
+      [](const py::tuple t) {
+        if (t.size() != 2)
+          throw std::runtime_error("Point pickle: Invalid state!");
+        Point p(t[0].cast<double>(), t[1].cast<double>());
+        return p;
+      }
+    ))
     ;
 
   py::class_<Vector>(m, "Vector")
@@ -868,6 +879,17 @@ PYBIND11_MODULE(geofun2, m) {
     .def(double() - py::self)
     .def(py::self - double())
     .def(-py::self)
+    .def(py::pickle(
+      [](const Vector& v) {
+        return py::make_tuple(v.get_azimuth(), v.get_length());
+      },
+      [](const py::tuple t) {
+        if (t.size() != 2)
+          throw std::runtime_error("Vector pickle: Invalid state!");
+        Vector v(t[0].cast<double>(), t[1].cast<double>());
+        return v;
+      }
+    ))
     ;
 
   py::class_<Position>(m, "Position")
@@ -908,5 +930,16 @@ PYBIND11_MODULE(geofun2, m) {
     .def(py::self * Vector())
     .def(py::self /= Vector())
     .def(py::self / Vector())
+    .def(py::pickle(
+      [](const Position& p) {
+        return py::make_tuple(p.get_latitude(), p.get_longitude());
+      },
+      [](const py::tuple t) {
+        if (t.size() != 2)
+          throw std::runtime_error("Position pickle: Invalid state!");
+        Position p(t[0].cast<double>(), t[1].cast<double>());
+        return p;
+      }
+    ))
     ;
 }

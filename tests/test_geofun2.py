@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import pickle
 import pytest
 from copy import copy
 
@@ -216,3 +217,13 @@ def test_numpy():
     a = np.array([p1, p2])
     assert (a == [[p1[0], p1[1]], [p2[0], p2[1]]]).all()
     assert (a.T == [[p1[0], p2[0]], [p1[1], p2[1]]]).all()
+
+
+def test_pickling():
+    p = Position(1., 1.)
+    with open('test.pickle', 'wb') as f:
+        pickle.dump(p, f)
+    with open('test.pickle', 'rb') as f:
+        p = pickle.load(f)
+    os.remove('test.pickle')
+    assert p.latitude == 1.
