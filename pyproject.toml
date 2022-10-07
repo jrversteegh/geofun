@@ -1,3 +1,62 @@
+[tool.poetry]
+name = "pygeofun"
+version = "0.0.4"
+description = "Geographic Functions: geodesics and rhumblines, orthodromes and loxodromes"
+authors = [
+  "Jaap Versteegh <j.r.versteegh@gmail.com>",
+]
+readme = "README.md"
+packages = [
+  { include  = "geofun", from = "src" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+
+[tool.poetry.scripts]
+
+[tool.poetry.extras]
+docs = ["Sphinx"]
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^7.34.0"
+black = "^22.6.0"
+isort = "^5.10.1"
+invoke = "^1.7.1"
+flake8-black = "^0.3.3"
+flake8-isort = "^4.2.0"
+flake8-junit-report = "^2.1.0"
+pytest = "^7.1.2"
+pytest-mock = "^3.8.2"
+pytest-cov = "^3.0.0"
+pybind11 = "^2.10.0"
+Sphinx = "^5.2.3"
+sphinx-rtd-theme = "^1.0.0"
+geographiclib = "^2.0"
+
+[tool.black]
+extend_exclude = ''
+
+[tool.isort]
+profile = "black"
+known_first_party = ["geofun"]
+extend_skip_glob = ["venv", ".venv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = """\
+    --cov-report=term-missing:skip-covered \
+    --cov-report=html \
+    --cov-report=xml \
+    """
+
+[tool.coverage]
+run = { source = ["geofun"], branch = true }
+html = { directory = "build/reports/coverage-html"}
+xml = { output = "build/reports/coverage.xml"}
+
 [build-system]
-requires = ["setuptools", "wheel", "pybind11"]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0", "wheel", "pybind11"]
+build-backend = "poetry.core.masonry.api"
