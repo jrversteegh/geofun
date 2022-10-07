@@ -17,7 +17,7 @@ make build && make install
 You should also be able to add this module to your python project's virtual environment by add the following to your `requirements.txt`:
 
 `
-git+https://github.com/jrversteegh/geofun.git@master#egg=geofun
+git+https://github.com/jrversteegh/geofun.git@master#egg=pygeofun
 `
 
 `pip install -r requirements.txt` should then automatically install geofun in your virtual environment.

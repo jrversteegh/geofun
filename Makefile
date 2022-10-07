@@ -1,9 +1,10 @@
 PYTHON := python3
 PYTHON_VERSION := $(shell if [ -d venv ]; then . venv/bin/activate; fi; $(PYTHON) -c "import sys; print(f'{sys.version_info[0]}.{sys.version_info[1]}')")
 SOURCE := $(wildcard src/*.cpp)
+PACKAGE_NAME := pygeofun
 VERSION := $(shell awk -F "=" '/version/ {print $$2}' setup.cfg | sed "s/ //g")
 EXTENSION_SUFFIX := $(shell if [ -d venv ]; then . venv/bin/activate; fi; python$(PYTHON_VERSION)-config --extension-suffix)
-WHEEL_NAME := $(shell if [ -d venv ]; then . venv/bin/activate; fi; $(PYTHON) -c "from setuptools.dist import Distribution;dist=Distribution(attrs={'name': 'geofun','version':'$(VERSION)','ext_modules':['geofun']});cmd=dist.get_command_obj('bdist_wheel');cmd.ensure_finalized();tag='-'.join(cmd.get_tag());print(f'dist/{cmd.wheel_dist_name}-{tag}.whl')")
+WHEEL_NAME := $(shell if [ -d venv ]; then . venv/bin/activate; fi; $(PYTHON) -c "from setuptools.dist import Distribution;dist=Distribution(attrs={'name': '$(PACKAGE_NAME)','version':'$(VERSION)','ext_modules':['geofun']});cmd=dist.get_command_obj('bdist_wheel');cmd.ensure_finalized();tag='-'.join(cmd.get_tag());print(f'dist/{cmd.wheel_dist_name}-{tag}.whl')")
 
 .PHONY: all
 all: $(ALL_TARGETS) test
@@ -31,13 +32,13 @@ $(WHEEL_NAME): venv/updated $(SOURCE) contrib/install/lib/libGeographic.a
 .PHONY: build
 build: $(WHEEL_NAME)
 
-venv/lib/python$(PYTHON_VERSION)/site-packages/geofun$(EXTENSION_SUFFIX): $(WHEEL_NAME)
+venv/lib/python$(PYTHON_VERSION)/site-packages/$(PACKAGE_NAME)$(EXTENSION_SUFFIX): $(WHEEL_NAME)
 	@echo "Installing: $@"
 	@if [ ! -f $(WHEEL_NAME) ]; then echo "Wheel doesn't exist. Do make again"; make; exit 0; else . venv/bin/activate; pip install --force-reinstall $(WHEEL_NAME); fi
 	@if [ -f "$@" ]; then touch "$@"; fi
 
 .PHONY: install
-install: venv/lib/python$(PYTHON_VERSION)/site-packages/geofun$(EXTENSION_SUFFIX)
+install: venv/lib/python$(PYTHON_VERSION)/site-packages/$(PACKAGE_NAME)$(EXTENSION_SUFFIX)
 
 .PHONY: test
 test: codestyle install
