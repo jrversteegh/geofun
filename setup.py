@@ -22,7 +22,7 @@ ext_modules = [
         sorted(glob("src/geofun/*.cpp")),
         include_dirs=['contrib/install/include'],
         library_dirs=['contrib/install/lib'],
-        libraries=['Geographic', 'fmt'],
+        libraries=['GeographicLib', 'fmt'],
     ),
 ]
 

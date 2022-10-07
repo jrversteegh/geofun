@@ -12,39 +12,36 @@ all: $(ALL_TARGETS) test
 contrib/geographiclib/CMakeLists.txt:
 	@git submodule update --init
 
-contrib/geographiclib/BUILD/Makefile: contrib/geographiclib/CMakeLists.txt
+contrib/build/geographiclib/Makefile: contrib/geographiclib/CMakeLists.txt
 	@which cmake >/dev/null || (echo "Error: cmake is required to build" && exit 1)
-	@mkdir -p contrib/geographiclib/BUILD
-	@cd contrib/geographiclib/BUILD && cmake -DCMAKE_INSTALL_PREFIX=../../install -DGEOGRAPHICLIB_LIB_TYPE=STATIC -DCMAKE_CXX_FLAGS=-fPIC ..
+	@mkdir -p contrib/build/geographiclib
+	@cd contrib/build/geographiclib && cmake -DCMAKE_INSTALL_PREFIX=../../install -DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS=-fPIC ../../geographiclib
 
-contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
+contrib/install/lib/libGeographicLib.a: contrib/build/geographiclib/Makefile
 	@which make >/dev/null || (echo "make is required to build" && exit 1)
 	@mkdir -p contrib/install
-	@cd contrib/geographiclib/BUILD && make -j 4 install
+	@cd contrib/build/geographiclib && make -j 4 install
 
 .PHONY: geographiclib
-geographiclib: contrib/install/lib/libGeographic.a
+geographiclib: contrib/install/lib/libGeographicLib.a
 
 contrib/fmt/CMakeLists.txt:
 	@git submodule update --init
 
-contrib/fmt/bin/Makefile: contrib/fmt/CMakeLists.txt
+contrib/build/fmt/Makefile: contrib/fmt/CMakeLists.txt
 	@which cmake >/dev/null || (echo "Error: cmake is required to build" && exit 1)
-	@mkdir -p contrib/fmt/bin
-	@cd contrib/fmt/bin && cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_CXX_FLAGS=-fPIC ..
+	@mkdir -p contrib/build/fmt
+	@cd contrib/build/fmt && cmake -DCMAKE_INSTALL_PREFIX=../../install -DFMT_TEST=OFF -DCMAKE_CXX_FLAGS=-fPIC ../../fmt
 
-contrib/install/lib/libfmt.a: contrib/fmt/bin/Makefile
+contrib/install/lib/libfmt.a: contrib/build/fmt/Makefile
 	@which make >/dev/null || (echo "make is required to build" && exit 1)
 	@mkdir -p contrib/install
-	@cd contrib/fmt/bin && make -j 4 install
-
-.PHONY: geographiclib
-geographiclib: contrib/install/lib/libGeographic.a
+	@cd contrib/build/fmt && make -j 4 install
 
 .PHONY: fmt
 fmt: contrib/install/lib/libfmt.a
 
-$(WHEEL_NAME): venv/updated $(SOURCE) contrib/install/lib/libGeographic.a contrib/install/lib/libfmt.a
+$(WHEEL_NAME): venv/updated $(SOURCE) contrib/install/lib/libGeographicLib.a contrib/install/lib/libfmt.a
 	@echo "Building: $(WHEEL_NAME) from $(SOURCE)"
 	@. venv/bin/activate; $(PYTHON) setup.py bdist_wheel
 
@@ -90,11 +87,11 @@ clean:
 
 .PHONY: distclean
 distclean: clean
+	@echo "Cleaning up contrib build..."
+	@rm -rf contrib/build
 	@echo "Cleaning up contrib install..."
 	@rm -rf contrib/install
 	@echo "Cleaning up GeographicLib..."
-	@rm -rf contrib/geographiclib/BUILD
-	@rm -rf contrib/fmt/bin
 	@rm -rf .pytest_cache
 	@rm -rf tests/logs
 	@echo "Removing virtual environment..."
