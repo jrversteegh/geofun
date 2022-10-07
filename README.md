@@ -20,7 +20,7 @@ You should also be able to add this module to your python project's virtual envi
 git+https://github.com/jrversteegh/geofun.git@master#egg=pygeofun
 `
 
-`pip install -r requirements.txt` should then automatically install geofun in your virtual environment.
+`pip install -r requirements.txt` should then automatically install pygeofun in your virtual environment.
 
 
 ## Examples

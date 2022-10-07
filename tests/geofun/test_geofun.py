@@ -6,7 +6,12 @@ import pytest
 from copy import copy
 
 import numpy as np
-from geofun import *
+from geofun import (
+    get_version,
+    angle_mod, angle_mod_signed,
+    rhumb_direct, rhumb_inverse, geodesic_direct, geodesic_inverse,
+    Point, Vector, Position,
+)
 
 
 def test_version():

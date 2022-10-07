@@ -2,3 +2,6 @@
 	path = contrib/geographiclib
 	url = https://git.code.sf.net/u/jrversteegh/geographiclib
 	branch = release
+[submodule "contrib/fmt"]
+	path = contrib/fmt
+	url = https://github.com/fmtlib/fmt

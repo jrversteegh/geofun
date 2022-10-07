@@ -1,6 +1,6 @@
 PYTHON := python3
 PYTHON_VERSION := $(shell if [ -d venv ]; then . venv/bin/activate; fi; $(PYTHON) -c "import sys; print(f'{sys.version_info[0]}.{sys.version_info[1]}')")
-SOURCE := $(wildcard src/*.cpp)
+SOURCE := $(wildcard src/geofun/*.cpp)
 PACKAGE_NAME := pygeofun
 VERSION := $(shell awk -F "=" '/version/ {print $$2}' setup.cfg | sed "s/ //g")
 EXTENSION_SUFFIX := $(shell if [ -d venv ]; then . venv/bin/activate; fi; python$(PYTHON_VERSION)-config --extension-suffix)
@@ -25,7 +25,26 @@ contrib/install/lib/libGeographic.a: contrib/geographiclib/BUILD/Makefile
 .PHONY: geographiclib
 geographiclib: contrib/install/lib/libGeographic.a
 
-$(WHEEL_NAME): venv/updated $(SOURCE) contrib/install/lib/libGeographic.a
+contrib/fmt/CMakeLists.txt:
+	@git submodule update --init
+
+contrib/fmt/bin/Makefile: contrib/fmt/CMakeLists.txt
+	@which cmake >/dev/null || (echo "Error: cmake is required to build" && exit 1)
+	@mkdir -p contrib/fmt/bin
+	@cd contrib/fmt/bin && cmake -DCMAKE_INSTALL_PREFIX=../../install -DCMAKE_CXX_FLAGS=-fPIC ..
+
+contrib/install/lib/libfmt.a: contrib/fmt/bin/Makefile
+	@which make >/dev/null || (echo "make is required to build" && exit 1)
+	@mkdir -p contrib/install
+	@cd contrib/fmt/bin && make -j 4 install
+
+.PHONY: geographiclib
+geographiclib: contrib/install/lib/libGeographic.a
+
+.PHONY: fmt
+fmt: contrib/install/lib/libfmt.a
+
+$(WHEEL_NAME): venv/updated $(SOURCE) contrib/install/lib/libGeographic.a contrib/install/lib/libfmt.a
 	@echo "Building: $(WHEEL_NAME) from $(SOURCE)"
 	@. venv/bin/activate; $(PYTHON) setup.py bdist_wheel
 
@@ -66,6 +85,7 @@ clean:
 	@rm -rf build
 	@echo "Cleaning up dist..."
 	@rm -rf dist
+	@rm -rf src/geofun/version.h
 	@echo "Done."
 
 .PHONY: distclean
@@ -74,6 +94,9 @@ distclean: clean
 	@rm -rf contrib/install
 	@echo "Cleaning up GeographicLib..."
 	@rm -rf contrib/geographiclib/BUILD
+	@rm -rf contrib/fmt/bin
+	@rm -rf .pytest_cache
+	@rm -rf tests/logs
 	@echo "Removing virtual environment..."
 	@which $(PYTHON) | grep venv >/dev/null 2>/dev/null && echo "Deactivate your virtual environment first" && exit 1 || echo "Virtual environment not active" 
 	@rm -rf venv

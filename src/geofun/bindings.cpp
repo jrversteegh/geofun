@@ -15,8 +15,8 @@
 #include <GeographicLib/Rhumb.hpp>
 #include <GeographicLib/Constants.hpp>
 
-#define FMT_HEADER_ONLY 1
-#include "fmt/format.h"
+#include <fmt/format.h>
+
 #include "version.h"
 
 using namespace GeographicLib;

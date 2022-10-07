@@ -5,5 +5,5 @@
 /dist
 /.env
 /venv
-/src/version.h
+/src/geofun/version.h
 /contrib/install
