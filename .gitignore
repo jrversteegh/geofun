@@ -1,6 +1,7 @@
 *.pyc
 *.log
 *.egg-info
+/setup.py
 /build
 /dist
 /.env
