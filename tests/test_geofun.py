@@ -5,13 +5,8 @@ import pickle
 import pytest
 from copy import copy
 
-try:
-    import conftest
-except ImportError:
-    from . import conftest
-
 import numpy as np
-from geofun2 import *
+from geofun import *
 
 
 def test_version():

@@ -17,7 +17,7 @@ with open('src/version.h', 'w') as f:
 
 ext_modules = [
     Pybind11Extension(
-        "geofun2",
+        "geofun",
         sorted(glob("src/*.cpp")),
         include_dirs=['contrib/install/include'],
         library_dirs=['contrib/install/lib'],

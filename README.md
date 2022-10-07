@@ -1,6 +1,6 @@
-# GeoFun2
+# GeoFun
 
-Successor to `geofun` C++ and python library for doing geographic calculations like distance, azimuth and position determination
+Library for doing geographic calculations like distance, azimuth and position determination
 for geodesics and rhumb lines, orthodromes and loxodromes, respectively.
 
 This version makes use of GeographicLib for doing most of the calculations.
@@ -17,16 +17,16 @@ make build && make install
 You should also be able to add this module to your python project's virtual environment by add the following to your `requirements.txt`:
 
 `
-git+https://github.com/jrversteegh/geofun2.git@master#egg=geofun2
+git+https://github.com/jrversteegh/geofun.git@master#egg=geofun
 `
 
-`pip install -r requirements.txt` should then automatically install geofun2 in your virtual environment.
+`pip install -r requirements.txt` should then automatically install geofun in your virtual environment.
 
 
 ## Examples
 
 ```python
-from geofun2 import Position, Vector
+from geofun import Position, Vector
 
 # Just off Hoek van Holland
 org = Position(52.0, 4.0)

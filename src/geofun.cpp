@@ -757,7 +757,7 @@ Vector operator/(const Position& position2, const Position& position1) {
 }
 
 
-PYBIND11_MODULE(geofun2, m) {
+PYBIND11_MODULE(geofun, m) {
   m.doc() = "Geographic utilities: orthodrome/loxodrome, geodesic/rhumb line evaluation.";
 
   m.def("get_version", &get_version,
