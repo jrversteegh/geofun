@@ -83,7 +83,8 @@ packages: venv/updated
 
 venv/bin/activate:
 	@echo "Setting up virtual environment..."
-	@(which python3.9 >/dev/null && which python3.9-config >/dev/null && python3.9 -mvenv venv) || \
+	@(which python3.10 >/dev/null && which python3.10-config >/dev/null && python3.10 -mvenv venv) || \
+	   (which python3.9 >/dev/null && which python3.9-config >/dev/null && python3.9 -mvenv venv) || \
 	   (which python3.8 >/dev/null && which python3.8-config >/dev/null && python3.8 -mvenv venv) || \
 	   (which python3.7 >/dev/null && which python3.7-config >/dev/null && python3.7 -mvenv venv) || \
 	   (echo "No python that has development files and virtualenv installed found. Maybe do 'apt install python3-dev python3-venv'?"; exit 1)
