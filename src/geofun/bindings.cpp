@@ -19,7 +19,7 @@
 
 #include "version.h"
 
-using namespace GeographicLib;
+namespace gl = GeographicLib;
 namespace py = pybind11;
 using namespace pybind11::literals;
 
@@ -101,7 +101,7 @@ std::string get_version() {
 
 
 py::tuple rhumb_direct(const double latitude, const double longitude, const double azimuth, const double distance) {
-  static const Rhumb& rhumb = Rhumb::WGS84();
+  static const gl::Rhumb& rhumb = gl::Rhumb::WGS84();
   double out_latitude;
   double out_longitude;
   rhumb.Direct(latitude, longitude, azimuth, distance, out_latitude, out_longitude);
@@ -110,7 +110,7 @@ py::tuple rhumb_direct(const double latitude, const double longitude, const doub
 
 
 py::tuple rhumb_inverse(const double latitude1, const double longitude1, const double latitude2, const double longitude2) {
-  static const Rhumb& rhumb = Rhumb::WGS84();
+  static const gl::Rhumb& rhumb = gl::Rhumb::WGS84();
   double azimuth;
   double distance;
   rhumb.Inverse(latitude1, longitude1, latitude2, longitude2, distance, azimuth);
@@ -119,7 +119,7 @@ py::tuple rhumb_inverse(const double latitude1, const double longitude1, const d
 
 
 py::tuple geodesic_direct(const double latitude, const double longitude, const double azimuth, const double distance) {
-  static const Geodesic& geodesic = Geodesic::WGS84();
+  static const gl::Geodesic& geodesic = gl::Geodesic::WGS84();
   double out_latitude;
   double out_longitude;
   double out_azimuth;
@@ -129,7 +129,7 @@ py::tuple geodesic_direct(const double latitude, const double longitude, const d
 
 
 py::tuple geodesic_inverse(const double latitude1, const double longitude1, const double latitude2, const double longitude2) {
-  static const Geodesic& geodesic = Geodesic::WGS84();
+  static const gl::Geodesic& geodesic = gl::Geodesic::WGS84();
   double azimuth1;
   double distance;
   double azimuth2;
@@ -139,7 +139,6 @@ py::tuple geodesic_inverse(const double latitude1, const double longitude1, cons
 
 
 struct Point {
-
   Point() = default;
   Point(const Point&) = default;
   Point(Point&&) = default;
@@ -259,11 +258,11 @@ struct Point {
     double y_frac = modf(y_, &i);
     std::string format = x_frac == 0.0 ? "Point({:.1f}" : "Point({:.15g}";
     format += y_frac == 0.0 ? ", {:.1f})" : ", {:.15g})";
-    return fmt::format(format, x_, y_);
+    return fmt::format(fmt::runtime(format), x_, y_);
   }
 
 private:
-  friend class Vector;
+  friend struct Vector;
   double x_;
   double y_;
 };
@@ -275,7 +274,6 @@ Point operator*(const double multiplier, const Point& point) {
 
 
 struct Vector {
-
   Vector() = default;
   Vector(const Vector&) = default;
   Vector(Vector&&) = default;
@@ -469,11 +467,11 @@ struct Vector {
     double y_frac = modf(length_, &i);
     std::string format = x_frac == 0.0 ? "Vector({:.1f}" : "Vector({:.15g}";
     format += y_frac == 0.0 ? ", {:.1f})" : ", {:.15g})";
-    return fmt::format(format, azimuth_, length_);
+    return fmt::format(fmt::runtime(format), azimuth_, length_);
   }
 
 private:
-  friend class Position;
+  friend struct Position;
   double azimuth_;
   double length_;
 };
@@ -496,7 +494,6 @@ Vector operator-(const double angle, const Vector& vector) {
 
 
 struct Position {
-
   Position() = default;
   Position(const Position&) = default;
   Position(Position&&) = default;
@@ -613,7 +610,7 @@ struct Position {
   }
 
   Position& operator+=(const Vector& vector) {
-    static const Rhumb& rhumb = Rhumb::WGS84();
+    static const gl::Rhumb& rhumb = gl::Rhumb::WGS84();
     double latitude;
     double longitude;
     rhumb.Direct(latitude_, longitude_, vector.azimuth_, vector.length_, latitude, longitude);
@@ -623,7 +620,7 @@ struct Position {
   }
 
   Position& operator-=(const Vector& vector) {
-    static const Rhumb& rhumb = Rhumb::WGS84();
+    static const gl::Rhumb& rhumb = gl::Rhumb::WGS84();
     double latitude;
     double longitude;
     rhumb.Direct(latitude_, longitude_, vector.azimuth_, -vector.length_, latitude, longitude);
@@ -633,7 +630,7 @@ struct Position {
   }
 
   Position& operator*=(const Vector& vector) {
-    static const Geodesic& geodesic = Geodesic::WGS84();
+    static const gl::Geodesic& geodesic = gl::Geodesic::WGS84();
     double latitude;
     double longitude;
     double azimuth;
@@ -644,7 +641,7 @@ struct Position {
   }
 
   Position& operator/=(const Vector& vector) {
-    static const Geodesic& geodesic = Geodesic::WGS84();
+    static const gl::Geodesic& geodesic = gl::Geodesic::WGS84();
     double latitude;
     double longitude;
     double azimuth;
@@ -714,7 +711,7 @@ struct Position {
     double y_frac = modf(longitude_, &i);
     std::string format = x_frac == 0.0 ? "Position({:.1f}" : "Position({:.15g}";
     format += y_frac == 0.0 ? ", {:.1f})" : ", {:.15g})";
-    return fmt::format(format, latitude_, longitude_);
+    return fmt::format(fmt::runtime(format), latitude_, longitude_);
   }
 
 private:
@@ -724,7 +721,7 @@ private:
 
 
 Vector operator-(const Position& position2, const Position& position1) {
-  static const Rhumb& rhumb = Rhumb::WGS84();
+  static const gl::Rhumb& rhumb = gl::Rhumb::WGS84();
   double azimuth;
   double distance;
   rhumb.Inverse(
@@ -740,7 +737,7 @@ Vector operator-(const Position& position2, const Position& position1) {
 
 
 Vector operator/(const Position& position2, const Position& position1) {
-  static const Geodesic& geodesic = Geodesic::WGS84();
+  static const gl::Geodesic& geodesic = gl::Geodesic::WGS84();
   double azimuth1;
   double azimuth2;
   double distance;
