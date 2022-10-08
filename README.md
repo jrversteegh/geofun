@@ -42,7 +42,7 @@ Out[6]:
     if you don\'t have it
 
 -   Check out the source code:
-    `git clone https://github.com/jrversteegh/geofun.git`
+    `git clone https://github.com/jrversteegh/geofun.git --recurse-submodules`
 
 -   Execute `poetry build` to build the package or `poetry install` to get a virtual environment 
     to work in. Both require a working modern C++ compiler. GCC 9.4 and MSVC 14.3 were tested. 
