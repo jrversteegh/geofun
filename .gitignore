@@ -1,6 +1,7 @@
 *.pyc
 *.log
 *.egg-info
+.python-version
 /setup.py
 /build
 /dist
