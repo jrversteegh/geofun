@@ -8,7 +8,14 @@ authors = [
 packages = [
   { include = "pygeofun", from = "src" }
 ]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
 readme = "README.md"
+homepage = "https://github.com/jrversteegh/geofun"
+repository = "https://github.com/jrversteegh/geofun"
 
 [tool.poetry.dependencies]
 python = "^3.8"
