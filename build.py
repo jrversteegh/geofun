@@ -1,6 +1,7 @@
 import os
 import sys
 import errno
+import platform
 import contextlib
 from pathlib import Path
 import subprocess
@@ -10,6 +11,7 @@ from pybind11.setup_helpers import Pybind11Extension, build_ext
 
 script_dir = Path(os.path.dirname(os.path.realpath(__file__)))
 
+on_windows = platform.system().startswith('Win')
 
 @contextlib.contextmanager
 def dir_context(new_dir):
@@ -25,9 +27,11 @@ def dir_context(new_dir):
         os.chdir(previous_dir)
 
 def build_and_install(build_dir, source_dir, config):
+    config_flag = ' --config Release' if on_windows else ''
+    pic_flag = '' if on_windows else ' -DCMAKE_CXX_FLAGS=-fPIC'
     with dir_context(build_dir):
-        os.system(f"{cmake} -DCMAKE_INSTALL_PREFIX={install_prefix} {config} {source_dir}")
-        os.system(f"{cmake} --build . --parallel 4")
+        os.system(f"{cmake} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX={install_prefix} {config}{pic_flag} {source_dir}")
+        os.system(f"{cmake} --build .{config_flag}")
         os.system(f"{cmake} --install .")
 
 def write_version_file():
@@ -55,7 +59,7 @@ fmt_build = script_dir / "contrib" / "build" / "fmt"
 python_dir = Path(os.path.dirname(sys.executable))
 cmake = python_dir / "cmake"
 
-build_and_install(geographic_build, geographic_source, "-DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS=-fPIC")
+build_and_install(geographic_build, geographic_source, "-DBUILD_SHARED_LIBS=OFF")
 build_and_install(fmt_build, fmt_source, "-DFMT_TEST=OFF -DCMAKE_CXX_FLAGS=-fPIC")
 
 write_version_file()

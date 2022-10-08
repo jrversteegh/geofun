@@ -10,3 +10,5 @@
 /contrib/install
 /contrib/build
 /src/*.so
+/src/*.pyd
+/1.0.0
