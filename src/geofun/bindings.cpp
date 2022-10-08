@@ -770,7 +770,7 @@ PYBIND11_MODULE(geofun, m) {
       "Get rhumb line azimuth, distance and final azimuth between positions");
   m.def("geodesic_direct", &geodesic_direct, "latitude"_a, "longitude"_a, "azimuth"_a, "distance"_a,
       "Get position and final azimuth after moving distance along great circle with starting azimuth");
-  m.def("geodesic_inverse", &geodesic_inverse, "latitude"_a, "longitude"_a, "azimuth"_a, "distance"_a,
+  m.def("geodesic_inverse", &geodesic_inverse, "latitude1"_a, "longitude1"_a, "latitude2"_a, "longitude2"_a,
       "Get starting azimuth, distance and ending azimuth of great circle between positions");
 
   // Angle arithmetic

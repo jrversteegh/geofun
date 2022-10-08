@@ -5,25 +5,56 @@ for geodesics and rhumb lines, orthodromes and loxodromes, respectively.
 
 This version makes use of GeographicLib for doing most of the calculations.
 
+This is a C++ package that uses pybind11 to wrap the C++ version of GeographicLib, which
+makes it faster (~100x) than the pure python version of [geographiclib](https://geographiclib.sourceforge.io/html/python/index.html).
+
+Compare:
+```Python
+In [1]: from geofun import geodesic_inverse
+
+In [2]: %timeit geodesic_inverse(52, 4, 28, -16.6)
+1.17 µs ± 37 ns per loop (mean ± std. dev. of 7 runs, 1000000 loops each)
+
+In [3]: from geographiclib.geodesic import Geodesic
+
+In [4]: %timeit Geodesic.WGS84.Inverse(52, 4, 28, -16.6)
+107 µs ± 170 ns per loop (mean ± std. dev. of 7 runs, 10000 loops each)
+
+In [5]: geodesic_inverse(52, 4, 28, -16.6)
+Out[5]: (-139.28471885516532, 3168557.154495447, -152.90624110350674)
+
+In [6]: Geodesic.WGS84.Inverse(52, 4, 28, -16.6)
+Out[6]:
+{'lat1': 52,
+ 'lon1': 4.0,
+ 'lat2': 28,
+ 'lon2': -16.6,
+ 'a12': 28.519118381735783,
+ 's12': 3168557.1544954455,
+ 'azi1': -139.28471885516532,
+ 'azi2': -152.90624110350674}
+```
+
 ## Building
 
-Currently only building on linux is supported. You'll need `c++`, `make` and `cmake`. When you have those, you should be able
-to run:
+-   Get
+    [poetry](https://python-poetry.org/docs/master/#installing-with-the-official-installer)
+    if you don\'t have it
 
-`
-make build && make install
-`
+-   Check out the source code:
+    `git clone https://github.com/jrversteegh/geofun.git`
 
-You should also be able to add this module to your python project's virtual environment by add the following to your `requirements.txt`:
-
-`
-git+https://github.com/jrversteegh/geofun.git@master#egg=pygeofun
-`
-
-`pip install -r requirements.txt` should then automatically install pygeofun in your virtual environment.
+-   Execute `poetry build` to build the package or `poetry install` to get a virtual environment 
+    to work in. Both require a working modern C++ compiler. GCC 9.4 and MSVC 14.3 were tested. 
+    Others may work.
 
 
 ## Examples
+
+Some operator abuse was used to mark the difference between geodesic and mercator based operations.
+`+` and `-` are addition and subtraction in the mercator projection (loxodromes) and `*` and `/`
+are addition and subtraction on geodesics (orthodromes). If you object to this, you're probably
+right. Any suggestions for a better way are quite welcome.
 
 ```python
 from geofun import Position, Vector
@@ -80,7 +111,7 @@ Point
 
    Get position and final azimuth after moving distance along great circle with starting azimuth
 
-`geodesic_inverse(latitude: float, longitude: float, azimuth: float, distance: float) -> tuple`
+`geodesic_inverse(latitude1: float, longitude1: float, latitude2: float, longitude2: float) -> tuple`
 
    Get starting azimuth, distance and ending azimuth of great circle between positions
 
