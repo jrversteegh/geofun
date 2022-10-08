@@ -520,7 +520,7 @@ struct Position {
     std::vector<double> values;
     bool is_integral = scan_floats(values, latitude);
     is_integral &= scan_floats(values, longitude);
-    int val_count = values.size();
+    int val_count = static_cast<int>(values.size());
     int i_count = val_count / 2;
     if ((val_count == 0) || (val_count % 2) || (i_count > 3)) {
       throw std::invalid_argument(fmt::format("Invalid argument count: {} for Position", val_count));
