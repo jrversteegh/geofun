@@ -30,6 +30,19 @@ def build_and_install(build_dir, source_dir, config):
         os.system(f"{cmake} --build . --parallel 4")
         os.system(f"{cmake} --install .")
 
+def write_version_file():
+    with dir_context(script_dir):
+        try:
+            # Create header with version info
+            with open("pyproject.toml", "rb") as f:
+                project = tomli.load(f)
+                version = project["tool"]["poetry"]["version"]
+        except OSError:
+            version = "0.0.0.dev"
+
+    with open("src/geofun/version.h", "w") as f:
+        f.write(f'#define VERSION "{version}"')
+
 # Build contrib packages
 install_prefix = Path("../../install")
 
@@ -45,14 +58,7 @@ cmake = python_dir / "cmake"
 build_and_install(geographic_build, geographic_source, "-DBUILD_SHARED_LIBS=OFF -DCMAKE_CXX_FLAGS=-fPIC")
 build_and_install(fmt_build, fmt_source, "-DFMT_TEST=OFF -DCMAKE_CXX_FLAGS=-fPIC")
 
-# Create header with version info
-with open("pyproject.toml", "rb") as f:
-    project = tomli.load(f)
-    version = project["tool"]["poetry"]["version"]
-
-with open("src/geofun/version.h", "w") as f:
-    f.write(f'#define VERSION "{version}"')
-
+write_version_file()
 
 def build(setup_kwargs):
     ext_modules = [

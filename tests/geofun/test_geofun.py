@@ -15,7 +15,7 @@ from geofun import (
 
 
 def test_version():
-    assert get_version() == "0.0.2"
+    assert get_version().startswith("0.0.")
 
 
 def test_angle_mod():

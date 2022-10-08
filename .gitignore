@@ -9,3 +9,4 @@
 /src/geofun/version.h
 /contrib/install
 /contrib/build
+/src/*.so

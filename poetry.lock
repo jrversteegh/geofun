@@ -67,6 +67,17 @@ python-versions = ">=3.6.0"
 unicode_backport = ["unicodedata2"]
 
 [[package]]
+name = "cmake"
+version = "3.24.1.1"
+description = "CMake is an open-source, cross-platform family of tools designed to build, test and package software"
+category = "dev"
+optional = false
+python-versions = "*"
+
+[package.extras]
+test = ["codecov (>=2.0.5)", "coverage (>=4.2)", "flake8 (>=3.0.4)", "path.py (>=11.5.0)", "pytest (>=3.0.3)", "pytest-cov (>=2.4.0)", "pytest-runner (>=2.9)", "pytest-virtualenv (>=1.7.0)", "scikit-build (>=0.10.0)", "setuptools (>=28.0.0)", "virtualenv (>=15.0.3)", "wheel"]
+
+[[package]]
 name = "colorama"
 version = "0.4.5"
 description = "Cross-platform colored terminal text."
@@ -575,6 +586,17 @@ optional = false
 python-versions = "*"
 
 [[package]]
+name = "wheel"
+version = "0.37.1"
+description = "A built-package format for Python"
+category = "dev"
+optional = false
+python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,>=2.7"
+
+[package.extras]
+test = ["pytest (>=3.0.0)", "pytest-cov"]
+
+[[package]]
 name = "zipp"
 version = "3.8.1"
 description = "Backport of pathlib-compatible object wrapper for zip files"
@@ -592,7 +614,7 @@ docs = []
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "cb96d7efb3c8eed4c5f65b2b4b1e0bea6fb16175b1aff0aae1e4b4575816633d"
+content-hash = "49f060c8c6aae5ae5a1a314d30c7d2d9b809df1386da4d9460220b68e1e33cc6"
 
 [metadata.files]
 alabaster = [
@@ -622,6 +644,24 @@ certifi = [
 charset-normalizer = [
     {file = "charset-normalizer-2.1.1.tar.gz", hash = "sha256:5a3d016c7c547f69d6f81fb0db9449ce888b418b5b9952cc5e6e66843e9dd845"},
     {file = "charset_normalizer-2.1.1-py3-none-any.whl", hash = "sha256:83e9a75d1911279afd89352c68b45348559d1fc0506b054b346651b5e7fee29f"},
+]
+cmake = [
+    {file = "cmake-3.24.1.1-py2.py3-none-macosx_10_10_universal2.macosx_10_10_x86_64.macosx_11_0_arm64.macosx_11_0_universal2.whl", hash = "sha256:5db44d09123d721785165918d5220c18c2fb8a4784b126922a208085bded627c"},
+    {file = "cmake-3.24.1.1-py2.py3-none-manylinux_2_12_i686.manylinux2010_i686.whl", hash = "sha256:d212e0945753420e02bdfaa3ba411b45af7bddb77e0db6335ee71b5cbbca6cea"},
+    {file = "cmake-3.24.1.1-py2.py3-none-manylinux_2_12_x86_64.manylinux2010_x86_64.whl", hash = "sha256:f4ebb3b09b19d9e244929c17367b7c899b68f871285e07fd72edd59cc819bd28"},
+    {file = "cmake-3.24.1.1-py2.py3-none-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:c9eca895c87c2d41d5766eacb1ece57e1ae51887bfa5501cb43b15f1b8d427ec"},
+    {file = "cmake-3.24.1.1-py2.py3-none-manylinux_2_17_i686.manylinux2014_i686.whl", hash = "sha256:2811de77fe8be5c14b6be395a6b9f60cd921ad84ca2491f92f6f5cce8570d7fb"},
+    {file = "cmake-3.24.1.1-py2.py3-none-manylinux_2_17_ppc64le.manylinux2014_ppc64le.whl", hash = "sha256:70fe2f46f66c265874b26fb43b3332d707a60d1e0151d8f76dfe6487f5119198"},
+    {file = "cmake-3.24.1.1-py2.py3-none-manylinux_2_17_s390x.manylinux2014_s390x.whl", hash = "sha256:4085aeaf85b462fee4f2f5e1b72e08136bfbc4f5c6241a521a1221d5f0a7eece"},
+    {file = "cmake-3.24.1.1-py2.py3-none-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:cdff2c7fecbc122af8d75f3a2fb977f2bd361c2db3bd753b8ff817ec6eb217f1"},
+    {file = "cmake-3.24.1.1-py2.py3-none-musllinux_1_1_aarch64.whl", hash = "sha256:1137407cb24c54c486184bde10aa74c50eb90604ee601c6c45e8c754112f236c"},
+    {file = "cmake-3.24.1.1-py2.py3-none-musllinux_1_1_i686.whl", hash = "sha256:36de1952e7ca22be42df591de192d0dbe1bf93f17e4a190dda9ecd4e6276e75d"},
+    {file = "cmake-3.24.1.1-py2.py3-none-musllinux_1_1_ppc64le.whl", hash = "sha256:fe0e398861aae4aee97f32ee0af02692b48f3685ac0d52fa463737090a667ce2"},
+    {file = "cmake-3.24.1.1-py2.py3-none-musllinux_1_1_s390x.whl", hash = "sha256:e7e9e737a14b9e6ac6ae5ad89c697aa9ba5e061564822f708a19dde3f9e382a4"},
+    {file = "cmake-3.24.1.1-py2.py3-none-musllinux_1_1_x86_64.whl", hash = "sha256:5f02962ef635429f7552a002701f2589c6ce061c2f0157722e03b9b3fefa7215"},
+    {file = "cmake-3.24.1.1-py2.py3-none-win32.whl", hash = "sha256:6dce0562d6a7707d10f5c41f1d3adca1f1f2971bfbb3d24a780252cb81101497"},
+    {file = "cmake-3.24.1.1-py2.py3-none-win_amd64.whl", hash = "sha256:04e1a874476ef03a433d49715295e2b9583ff9fdb5b6f34572281e1b61e55b5f"},
+    {file = "cmake-3.24.1.1.tar.gz", hash = "sha256:7cccfc0388bfe4cb6a465fb8f8a57861c83c60956653b314cfde47865d94f03e"},
 ]
 colorama = [
     {file = "colorama-0.4.5-py2.py3-none-any.whl", hash = "sha256:854bf444933e37f5824ae7bfc1e98d5bce2ebe4160d46b5edf346a89358e99da"},
@@ -858,6 +898,10 @@ urllib3 = [
 wcwidth = [
     {file = "wcwidth-0.2.5-py2.py3-none-any.whl", hash = "sha256:beb4802a9cebb9144e99086eff703a642a13d6a0052920003a230f3294bbe784"},
     {file = "wcwidth-0.2.5.tar.gz", hash = "sha256:c4d647b99872929fdb7bdcaa4fbe7f01413ed3d98077df798530e5b04f116c83"},
+]
+wheel = [
+    {file = "wheel-0.37.1-py2.py3-none-any.whl", hash = "sha256:4bdcd7d840138086126cd09254dc6195fb4fc6f01c050a1d7236f2630db1d22a"},
+    {file = "wheel-0.37.1.tar.gz", hash = "sha256:e9a504e793efbca1b8e0e9cb979a249cf4a0a7b5b8c9e8b65a5e39d49529c1c4"},
 ]
 zipp = [
     {file = "zipp-3.8.1-py3-none-any.whl", hash = "sha256:47c40d7fe183a6f21403a199b3e4192cca5774656965b0a4988ad2f8feb5f009"},
