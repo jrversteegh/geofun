@@ -6,3 +6,4 @@
 ignore = E303, F405, F401 __init__.py, F403 __init__.py, E402 conftest.py
 # Default of 80 somewhat pedantic
 max-line-length = 96
+exclude = venv,.venv,contrib
