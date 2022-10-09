@@ -36,6 +36,7 @@ cmake = "^3.24.1.1"
 wheel = "^0.37.1"
 setuptools = "^65.4.1"
 tomli = "^2.0.1"
+poetry = "^1.2.1"
 
 [tool.poetry.build]
 script = "build.py"
