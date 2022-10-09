@@ -2,16 +2,14 @@
 
 import os
 import pickle
-import pytest
 from copy import copy
 
 import numpy as np
-from geofun import (
-    get_version,
-    angle_mod, angle_mod_signed,
-    rhumb_direct, rhumb_inverse, geodesic_direct, geodesic_inverse,
-    Point, Vector, Position,
-)
+import pytest
+
+from geofun import (Point, Position, Vector, angle_mod, angle_mod_signed,
+                    geodesic_direct, geodesic_inverse, get_version,
+                    rhumb_direct, rhumb_inverse)
 
 
 def test_version():
@@ -30,35 +28,35 @@ def test_angle_mod():
 
 
 def test_rhumb_direct(log):
-    lat, lon, azi = rhumb_direct(52., 4., 45., 10000)
-    log.debug(f'lat: {lat}, lon: {lon}, azi: {azi}')
-    assert lat == pytest.approx(52.0635499025, abs=1E-8)
-    assert lon == pytest.approx(4.10303268597, abs=1E-8)
-    assert azi == pytest.approx(45., abs=1E-8)
+    lat, lon, azi = rhumb_direct(52.0, 4.0, 45.0, 10000)
+    log.debug(f"lat: {lat}, lon: {lon}, azi: {azi}")
+    assert lat == pytest.approx(52.0635499025, abs=1e-8)
+    assert lon == pytest.approx(4.10303268597, abs=1e-8)
+    assert azi == pytest.approx(45.0, abs=1e-8)
 
 
 def test_rhumb_inverse(log):
-    azi1, dist, azi2 = rhumb_inverse(52., 4., 52.0635499025, 4.10303268597)
-    log.debug(f'azi1: {azi1}, dist: {dist}, azi2: {azi2}')
-    assert azi1 == pytest.approx(45., abs=1E-8)
-    assert azi2 == pytest.approx(45., abs=1E-8)
-    assert dist == pytest.approx(10000, abs=1E-4)
+    azi1, dist, azi2 = rhumb_inverse(52.0, 4.0, 52.0635499025, 4.10303268597)
+    log.debug(f"azi1: {azi1}, dist: {dist}, azi2: {azi2}")
+    assert azi1 == pytest.approx(45.0, abs=1e-8)
+    assert azi2 == pytest.approx(45.0, abs=1e-8)
+    assert dist == pytest.approx(10000, abs=1e-4)
 
 
 def test_geodesic_direct(log):
-    lat, lon, azi = geodesic_direct(52., 4., 45., 10000.)
-    log.debug(f'lat: {lat}, lon: {lon}, azi: {azi}')
-    assert lat == pytest.approx(52.0635048312, abs=1E-8)
-    assert lon == pytest.approx(4.10310567353, abs=1E-8)
-    assert azi == pytest.approx(45.0812835607, abs=1E-8)
+    lat, lon, azi = geodesic_direct(52.0, 4.0, 45.0, 10000.0)
+    log.debug(f"lat: {lat}, lon: {lon}, azi: {azi}")
+    assert lat == pytest.approx(52.0635048312, abs=1e-8)
+    assert lon == pytest.approx(4.10310567353, abs=1e-8)
+    assert azi == pytest.approx(45.0812835607, abs=1e-8)
 
 
 def test_geodesic_inverse(log):
-    azi1, dist, azi2 = geodesic_inverse(52., 4., 52.0635048312, 4.10310567353)
-    log.debug(f'azi1: {azi1}, dist: {dist}, azi2: {azi2}')
-    assert azi1 == pytest.approx(45., abs=1E-8)
-    assert azi2 == pytest.approx(45.0812835607, abs=1E-8)
-    assert dist == pytest.approx(10000, abs=1E-4)
+    azi1, dist, azi2 = geodesic_inverse(52.0, 4.0, 52.0635048312, 4.10310567353)
+    log.debug(f"azi1: {azi1}, dist: {dist}, azi2: {azi2}")
+    assert azi1 == pytest.approx(45.0, abs=1e-8)
+    assert azi2 == pytest.approx(45.0812835607, abs=1e-8)
+    assert dist == pytest.approx(10000, abs=1e-4)
 
 
 def test_point():
@@ -102,15 +100,15 @@ def test_vector():
     assert v3.dot(v4) == pytest.approx(v3.x * v4.x + v3.y * v4.y)
     assert v3.cross(v4) == pytest.approx(1)
     assert v3.cross(v4) == pytest.approx(v3.x * v4.y - v4.x * v3.y)
-    v5 = Vector(0., 2.)
-    v6 = Vector(30., 3.)
-    assert v5.cross(v6.norm()) == pytest.approx(1.)
+    v5 = Vector(0.0, 2.0)
+    v6 = Vector(30.0, 3.0)
+    assert v5.cross(v6.norm()) == pytest.approx(1.0)
 
 
 def test_position(log):
     # Dubious feature: automatic construction from seconds
-    assert Position(1, 1) != Position(1., 1.)
-    pos1 = Position(45., 1.)
+    assert Position(1, 1) != Position(1.0, 1.0)
+    pos1 = Position(45.0, 1.0)
     assert pos1.latitude == pytest.approx(45)
     assert pos1.longitude == pytest.approx(1)
     assert pos1.latitude == pos1[0]
@@ -122,20 +120,20 @@ def test_position(log):
     v2 = pos2 / pos1
     assert v1.azimuth == pytest.approx(180)
     assert v2.azimuth == pytest.approx(180)
-    assert v1.length == pytest.approx(60 * 1852, abs=3.)
-    assert v2.length == pytest.approx(60 * 1852, abs=3.)
+    assert v1.length == pytest.approx(60 * 1852, abs=3.0)
+    assert v2.length == pytest.approx(60 * 1852, abs=3.0)
     pos1 += v1
     assert pos1 == pos2
     v3 = -v2 * 0.1
     for i in range(10):
         pos2 *= v3
-    pos1 = Position(45., 1.)
+    pos1 = Position(45.0, 1.0)
     assert pos1 == pos2
 
     pos2 = Position(latitude=45, longitude=1)
     assert pos1 == pos2
 
-    pos2 = pos1 + Vector(90, 40E3)
+    pos2 = pos1 + Vector(90, 40e3)
     assert pos2[1] == pytest.approx(1.507312689879)
     pos2[1] = 358
     assert pos2.longitude == -2
@@ -145,54 +143,54 @@ def test_position(log):
 
 
 def test_string_construction(log):
-    p = Position('52.1', '4.1')
+    p = Position("52.1", "4.1")
     assert p.latitude == pytest.approx(52.1)
     assert p.longitude == pytest.approx(4.1)
-    p = Position('7200', '3600')
+    p = Position("7200", "3600")
     assert p.latitude == pytest.approx(2)
     assert p.longitude == pytest.approx(1)
-    p = Position('7200 3600')
+    p = Position("7200 3600")
     assert p.latitude == pytest.approx(2)
     assert p.longitude == pytest.approx(1)
-    p = Position('4.1W 12.0N')
+    p = Position("4.1W 12.0N")
     assert p.latitude == pytest.approx(12)
     assert p.longitude == pytest.approx(-4.1)
-    p = Position('00°30\'00"S 00°30\'00W"')
+    p = Position("00°30'00\"S 00°30'00W\"")
     assert p.latitude == pytest.approx(-0.5)
     assert p.longitude == pytest.approx(-0.5)
-    p = Position('-00°00\'30" 00°00\'30"')
-    assert p.latitude == pytest.approx(-1. / 120.)
-    assert p.longitude == pytest.approx(1. / 120.)
-    p = Position('-89°30.5 00°00.50')
-    assert p.latitude == pytest.approx(-89 - 61. / 120.)
-    assert p.longitude == pytest.approx(1. / 120.)
+    p = Position("-00°00'30\" 00°00'30\"")
+    assert p.latitude == pytest.approx(-1.0 / 120.0)
+    assert p.longitude == pytest.approx(1.0 / 120.0)
+    p = Position("-89°30.5 00°00.50")
+    assert p.latitude == pytest.approx(-89 - 61.0 / 120.0)
+    assert p.longitude == pytest.approx(1.0 / 120.0)
 
 
 def test_repr_and_str(log):
     p = Point(3.131313, 5.151515)
-    assert str(p) == '3.131, 5.152'
-    assert repr(p) == 'Point(3.131313, 5.151515)'
+    assert str(p) == "3.131, 5.152"
+    assert repr(p) == "Point(3.131313, 5.151515)"
     p = Point(300000.131313, 500000.151515)
-    assert str(p) == '300000.131, 500000.152'
-    assert repr(p) == 'Point(300000.131313, 500000.151515)'
+    assert str(p) == "300000.131, 500000.152"
+    assert repr(p) == "Point(300000.131313, 500000.151515)"
     p = Point(3, 5)
-    assert str(p) == '3.000, 5.000'
-    assert repr(p) == 'Point(3.0, 5.0)'
-    pos = Position('-89°30.5S 00°00.50')
-    assert str(pos) == '89.50833333, 0.00833333'
-    assert repr(pos) == 'Position(89.5083333333333, 0.00833333333333333)'
+    assert str(p) == "3.000, 5.000"
+    assert repr(p) == "Point(3.0, 5.0)"
+    pos = Position("-89°30.5S 00°00.50")
+    assert str(pos) == "89.50833333, 0.00833333"
+    assert repr(pos) == "Position(89.5083333333333, 0.00833333333333333)"
     v = Vector(45, 88)
-    assert str(v) == '45.000, 88.000'
-    assert repr(v) == 'Vector(45.0, 88.0)'
+    assert str(v) == "45.000, 88.000"
+    assert repr(v) == "Vector(45.0, 88.0)"
 
 
 def test_comparison(log):
     p = Point(3.131313, 5.151515)
     v = Vector(45, 88)
-    pos = Position('-89°30.5S 00°00.50')
+    pos = Position("-89°30.5S 00°00.50")
     assert p == (3.131313, 5.151515)
     assert (3.131313, 5.151515) == p
-    assert v == (45., 88.)
+    assert v == (45.0, 88.0)
     assert pos == (89.50833333333, 0.008333333333333)
     p = v.point()
     assert p.x == pytest.approx(62.2253967)
@@ -212,18 +210,18 @@ def test_comparison(log):
 
 
 def test_numpy():
-    p1 = Point(3., 5.)
-    p2 = Point(3., 6.)
+    p1 = Point(3.0, 5.0)
+    p2 = Point(3.0, 6.0)
     a = np.array([p1, p2])
     assert (a == [[p1[0], p1[1]], [p2[0], p2[1]]]).all()
     assert (a.T == [[p1[0], p2[0]], [p1[1], p2[1]]]).all()
 
 
 def test_pickling():
-    p = Position(1., 1.)
-    with open('test.pickle', 'wb') as f:
+    p = Position(1.0, 1.0)
+    with open("test.pickle", "wb") as f:
         pickle.dump(p, f)
-    with open('test.pickle', 'rb') as f:
+    with open("test.pickle", "rb") as f:
         p = pickle.load(f)
-    os.remove('test.pickle')
-    assert p.latitude == 1.
+    os.remove("test.pickle")
+    assert p.latitude == 1.0

@@ -1,17 +1,18 @@
-import os
-import sys
-import errno
-import platform
 import contextlib
-from pathlib import Path
+import errno
+import os
+import platform
 import subprocess
+import sys
+from pathlib import Path
 
 import tomli
 from pybind11.setup_helpers import Pybind11Extension, build_ext
 
 script_dir = Path(os.path.dirname(os.path.realpath(__file__)))
 
-on_windows = platform.system().startswith('Win')
+on_windows = platform.system().startswith("Win")
+
 
 @contextlib.contextmanager
 def dir_context(new_dir):
@@ -26,13 +27,17 @@ def dir_context(new_dir):
     finally:
         os.chdir(previous_dir)
 
+
 def build_and_install(build_dir, source_dir, config):
-    config_flag = ' --config Release' if on_windows else ''
-    pic_flag = '' if on_windows else ' -DCMAKE_CXX_FLAGS=-fPIC'
+    config_flag = " --config Release" if on_windows else ""
+    pic_flag = "" if on_windows else " -DCMAKE_CXX_FLAGS=-fPIC"
     with dir_context(build_dir):
-        os.system(f"{cmake} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX={install_prefix} {config}{pic_flag} {source_dir}")
+        os.system(
+            f"{cmake} -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX={install_prefix} {config}{pic_flag} {source_dir}"
+        )
         os.system(f"{cmake} --build .{config_flag}")
         os.system(f"{cmake} --install .")
+
 
 def write_version_file():
     with dir_context(script_dir):
@@ -46,6 +51,7 @@ def write_version_file():
 
     with open("src/geofun/version.h", "w") as f:
         f.write(f'#define VERSION "{version}"')
+
 
 # Build contrib packages
 install_prefix = Path("../../install")
@@ -63,6 +69,7 @@ build_and_install(geographic_build, geographic_source, "-DBUILD_SHARED_LIBS=OFF"
 build_and_install(fmt_build, fmt_source, "-DFMT_TEST=OFF -DCMAKE_CXX_FLAGS=-fPIC")
 
 write_version_file()
+
 
 def build(setup_kwargs):
     ext_modules = [

@@ -4,7 +4,7 @@ from invoke import task
 @task
 def format(ctx):
     """Run black and isort"""
-    for cmd in ("black .", "isort .", "pandoc -s -o README.md README.rst"):
+    for cmd in ("black .", "isort .", "pandoc -s -o README.rst README.md"):
         ctx.run(cmd, echo=True)
 
 

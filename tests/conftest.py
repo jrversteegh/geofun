@@ -1,16 +1,15 @@
-import os
-import sys
 import errno
 import logging
-import pytest
-
+import os
+import sys
 
 import __main__ as main
+import pytest
 
 scriptdir = os.path.dirname(os.path.realpath(__file__))
 os.chdir(scriptdir)
 
-logdir = scriptdir + '/logs'
+logdir = scriptdir + "/logs"
 try:
     os.mkdir(logdir)
 except (OSError, FileExistsError) as e:
@@ -20,19 +19,19 @@ except (OSError, FileExistsError) as e:
 except Exception as e:
     print(e)
 
-_logname = f'{logdir}/{os.path.splitext(os.path.basename(main.__file__))[0]}.log'
+_logname = f"{logdir}/{os.path.splitext(os.path.basename(main.__file__))[0]}.log"
 
 logging.basicConfig(
     filename=_logname,
     level=logging.DEBUG,
-    filemode='w',
-    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
+    filemode="w",
+    format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
 )
 
 
 @pytest.fixture
 def log(request):
-    result = logging.getLogger(f'test.{request.node.name}')
+    result = logging.getLogger(f"test.{request.node.name}")
     yield result
     for handler in result.handlers:
         handler.flush()
