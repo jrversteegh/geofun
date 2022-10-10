@@ -100,11 +100,25 @@ welcome.
 Classes
 -------
 
-Position - latitude - longitude
+**Position**
+  - latitude
+  - longitude
 
-Vector - azimuth - length
+``Position(latitude: int, longitude: int) -> Position`` Position in arc seconds.
 
-Point - x - y
+``Position(latitude: float, longitude: float) -> Position`` Position in arc degrees.
+
+**Vector**
+  - azimuth 
+  - length
+
+``Vector(azimuth: float, length: float) -> Vector`` Polar vector in arc degrees and meters.
+
+**Point**
+  - x 
+  - y
+
+``Point(x: float, y: float) -> Point`` Point on locally flat coordinate system, x pointing north, y pointing east.
 
 Functions
 ---------
