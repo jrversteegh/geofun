@@ -1,5 +1,4 @@
 setuptools
+cmake
 pybind11
-pytest
-flake8
-numpy
+tomli

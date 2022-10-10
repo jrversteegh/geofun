@@ -6,7 +6,13 @@ authors = [
   "Jaap Versteegh <j.r.versteegh@gmail.com>",
 ]
 packages = [
-  { include = "pygeofun", from = "src" }
+  { include = "pygeofun", from = "src" },
+]
+include = [
+  { path = "requirements.txt", format = "sdist" },
+  { path = "src/geofun", format = "sdist" },
+  { path = "contrib/fmt", format = "sdist" },
+  { path = "contrib/geographiclib", format = "sdist" }
 ]
 classifiers = [
   "Programming Language :: Python :: 3",
