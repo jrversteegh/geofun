@@ -21,6 +21,14 @@ classifiers = [
   "Scientific/Engineering :: GIS"
 ]
 readme = "README.rst"
+keywords = [
+  "geodesic",
+  "rhumb line",
+  "loxodrome",
+  "orthodrome",
+  "distance",
+  "azimuth"
+]
 homepage = "https://github.com/jrversteegh/geofun"
 repository = "https://github.com/jrversteegh/geofun"
 
