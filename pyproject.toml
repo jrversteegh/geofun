@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pygeofun"
-version = "0.0.10"
+version = "0.0.11"
 description = "Geographic Functions: geodesics and rhumblines, orthodromes and loxodromes"
 authors = [
   "Jaap Versteegh <j.r.versteegh@gmail.com>",
