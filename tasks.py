@@ -1,5 +1,9 @@
 import platform
-
+import inspect
+# Monkey patch for invoke which isn't py311 ready. See https://github.com/pyinvoke/invoke/issues/833
+# TODO: remove once invoke supports python3.11
+if not hasattr(inspect, "getargspec"):
+    inspect.getargspec = inspect.getfullargspec
 from invoke import task
 
 
@@ -51,7 +55,7 @@ def build(ctx):
                 "pyenv exec poetry run poetry build",
             ]
     else:
-        for pyver in ("3.8", "3.9", "3.10"):
+        for pyver in ("3.8", "3.9", "3.10", "3.11"):
             cmds += [
                 f"poetry env use {pyver}",
                 "poetry update",
