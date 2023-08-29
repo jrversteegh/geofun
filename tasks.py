@@ -1,4 +1,6 @@
 import inspect
+import os
+from pathlib import Path
 import platform
 
 # Monkey patch for invoke which isn't py311 ready. See https://github.com/pyinvoke/invoke/issues/833
@@ -7,6 +9,7 @@ if not hasattr(inspect, "getargspec"):
     inspect.getargspec = inspect.getfullargspec
 from invoke import task
 
+os.chdir(Path(__file__).parent)
 
 @task
 def format(ctx):
@@ -46,6 +49,7 @@ def build(ctx):
     if platform.platform().startswith("Win"):
         for pyver in ("3.8.10", "3.9.13", "3.10.11", "3.11.5"):
             cmds += [
+                "del /S /Q build",
                 f"pyenv install {pyver}",
                 f"pyenv local {pyver}",
                 "pyenv local",
@@ -58,6 +62,7 @@ def build(ctx):
     else:
         for pyver in ("3.8", "3.9", "3.10", "3.11"):
             cmds += [
+                "rm -rf build",
                 f"poetry env use {pyver}",
                 "poetry update",
                 "poetry install",
@@ -71,22 +76,9 @@ def build(ctx):
 @task(build)
 def publish(ctx):
     """Publish"""
-    cmds = []
-
-    if platform.platform().startswith("Win"):
-        for pyver in ("3.8.10", "3.9.13", "3.10.11", "3.11.5"):
-            cmds += [
-                f"pyenv local {pyver}",
-                "pyenv local",
-                "pyenv exec poetry env use python",
-                "pyenv exec poetry run poetry publish",
-            ]
-    else:
-        for pyver in ("3.8", "3.9", "3.10", "3.11"):
-            cmds += [
-                f"poetry env use {pyver}",
-                "poetry run poetry publish",
-            ]
+    cmds = [
+        "poetry publish",
+    ]
 
     for cmd in cmds:
         ctx.run(cmd, echo=True)
