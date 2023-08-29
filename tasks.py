@@ -38,8 +38,8 @@ def build_doc(ctx):
 
 
 @task
-def build(ctx):
-    """Build"""
+def publish(ctx):
+    """Publish"""
     cmds = []
 
     if platform.platform().startswith("Win"):
@@ -53,6 +53,7 @@ def build(ctx):
                 "pyenv exec poetry update",
                 "pyenv exec poetry install",
                 "pyenv exec poetry run poetry build",
+                "pyenv exec poetry run poetry publish",
             ]
     else:
         for pyver in ("3.8", "3.9", "3.10", "3.11"):
@@ -61,6 +62,7 @@ def build(ctx):
                 "poetry update",
                 "poetry install",
                 "poetry run poetry build",
+                "poetry run poetry publish",
             ]
 
     for cmd in cmds:
