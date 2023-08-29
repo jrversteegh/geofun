@@ -43,7 +43,7 @@ def build(ctx):
     cmds = []
 
     if platform.platform().startswith("Win"):
-        for pyver in ("3.8.10", "3.9.13", "3.10.7"):
+        for pyver in ("3.8.10", "3.9.13", "3.10.11", "3.11.5"):
             cmds += [
                 f"pyenv install {pyver}",
                 f"pyenv local {pyver}",
