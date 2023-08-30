@@ -147,6 +147,8 @@ Classes
 
 ``Position(latitude: float, longitude: float) -> Position`` Position in arc degrees.
 
+``Position(position: str) -> Position`` Position parsed from string.
+
 **Vector**
   - azimuth 
   - length
@@ -158,6 +160,15 @@ Classes
   - y
 
 ``Point(x: float, y: float) -> Point`` Point on locally flat coordinate system, x pointing north, y pointing east.
+
+Many operators will work on classes like:
+
+- *Point* + *Point*, adds x and y coordinates of points
+- *Point* + *Vector*, offsets point by vector
+- *Position* + *Vector*, offsets position by vector along loxodrome
+- *Position* * *Vector*, offsets position by vector along orthodrome
+- *Position* - *Position*, get loxodromic vector from position to position
+- *Position* / *Position*, get orthodromic vector from position to position
 
 Functions
 ---------
