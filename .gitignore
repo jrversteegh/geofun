@@ -15,3 +15,4 @@
 /docs/source
 /1.0.0
 /poetry.lock
+/.coverage

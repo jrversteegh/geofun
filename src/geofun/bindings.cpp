@@ -138,6 +138,9 @@ py::tuple geodesic_inverse(const double latitude1, const double longitude1, cons
 }
 
 
+struct Vector;
+struct Position;
+
 struct Point {
   Point() = default;
   Point(const Point&) = default;
@@ -194,11 +197,15 @@ struct Point {
     return *this;
   }
 
+  Point& operator+=(const Vector& vector);
+  Point& operator-=(const Vector& vector);
+
   Point operator+(const Point& point) const {
     Point result(*this);
     result += point;
     return result;
   }
+
 
   Point operator-(const Point& point) const {
     Point result(*this);
@@ -381,6 +388,10 @@ struct Vector {
     return set_length(length_ * multiplier);
   }
 
+  Vector& operator/=(const double divider) {
+    return set_length(length_ / divider);
+  }
+
   Vector operator+(const Vector& vector) const {
     Vector result(*this);
     result += vector;
@@ -408,6 +419,12 @@ struct Vector {
   Vector operator*(const double multiplier) const {
     Vector result(*this);
     result *= multiplier;
+    return result;
+  }
+
+  Vector operator/(const double divider) const {
+    Vector result(*this);
+    result /= divider;
     return result;
   }
 
@@ -470,6 +487,8 @@ struct Vector {
     return fmt::format(fmt::runtime(format), azimuth_, length_);
   }
 
+  std::vector<Position> split_ortho(const Position& start, const int number_of_segments) const;
+  std::vector<Position> split_loxo(const Position& start, const int number_of_segments) const;
 private:
   friend struct Position;
   double azimuth_;
@@ -492,6 +511,30 @@ Vector operator-(const double angle, const Vector& vector) {
   return -vector.operator+(angle);
 }
 
+
+Point& Point::operator+=(const Vector& vector) {
+  x_ += vector.get_x();
+  y_ += vector.get_y();
+  return *this;
+}
+
+Point& Point::operator-=(const Vector& vector) {
+  x_ -= vector.get_x();
+  y_ -= vector.get_y();
+  return *this;
+}
+
+Point operator+(const Point& point, const Vector& vector) {
+  Point result{point};
+  result += vector;
+  return result;
+}
+
+Point operator-(const Point& point, const Vector& vector) {
+  Point result{point};
+  result -= vector;
+  return result;
+}
 
 struct Position {
   Position() = default;
@@ -753,6 +796,29 @@ Vector operator/(const Position& position2, const Position& position1) {
   return Vector(azimuth1, distance);
 }
 
+std::vector<Position> Vector::split_ortho(const Position& start, const int number_of_segments) const {
+  std::vector<Position> result{};
+  Position position = start;
+  Position end = start * *this;
+  result.push_back(position);
+  for (int i = number_of_segments; i > 0; --i) {
+    position *= (end / position) / double(i);
+    result.push_back(position);
+  }
+  return result;
+}
+
+std::vector<Position> Vector::split_loxo(const Position& start, const int number_of_segments) const {
+  std::vector<Position> result{};
+  Position position = start;
+  result.push_back(position);
+  Vector segment = *this / double(number_of_segments);
+  for (int i = 0; i < number_of_segments; ++i) {
+    position += segment;
+    result.push_back(position);
+  }
+  return result;
+}
 
 PYBIND11_MODULE(geofun, m) {
   m.doc() = "Geographic utilities: orthodrome/loxodrome, geodesic/rhumb line evaluation.";
@@ -805,9 +871,13 @@ PYBIND11_MODULE(geofun, m) {
     .def(py::self == Vector())
     .def(py::self == std::vector<double>())
     .def(py::self += py::self)
-    .def(py::self + py::self)
     .def(py::self -= py::self)
+    .def(py::self += Vector())
+    .def(py::self -= Vector())
+    .def(py::self + py::self)
     .def(py::self - py::self)
+    .def(py::self + Vector())
+    .def(py::self - Vector())
     .def(py::self *= double())
     .def(double() * py::self)
     .def(py::self * double())
@@ -851,6 +921,10 @@ PYBIND11_MODULE(geofun, m) {
         "Return the cross product of this vector with \"other\".")
     .def("point", &Vector::point,
         "Return copy of vector as Point with x, y coordinates.")
+    .def("split_ortho", &Vector::split_ortho, py::arg("start"), py::arg("number_of_segments"),
+        "Split orthodromic vector from start position into number of segments")
+    .def("split_loxo", &Vector::split_loxo, py::arg("start"), py::arg("number_of_segments"),
+        "Split loxodromic vector from start position into number of segments")
     .def_property("azimuth", &Vector::get_azimuth, &Vector::set_azimuth,
         "Azimuth of vector")
     .def_property("length", &Vector::get_length, &Vector::set_length,
@@ -867,8 +941,10 @@ PYBIND11_MODULE(geofun, m) {
     .def(py::self -= py::self)
     .def(py::self - py::self)
     .def(py::self *= double())
+    .def(py::self /= double())
     .def(double() * py::self)
     .def(py::self * double())
+    .def(py::self / double())
     .def(py::self += double())
     .def(double() + py::self)
     .def(py::self + double())

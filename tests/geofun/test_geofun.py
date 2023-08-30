@@ -225,3 +225,21 @@ def test_pickling():
         p = pickle.load(f)
     os.remove("test.pickle")
     assert p.latitude == 1.0
+
+
+def test_vector_split_loxo():
+    JFK = Position("40°38′23″N 73°46′44″W")
+    AMS = Position("52°18′00″N 4°45′54″E")
+    result = (AMS - JFK).split_loxo(JFK, 10)
+    assert len(result) == 11
+    assert result[0] == JFK
+    assert result[-1] == AMS
+
+
+def test_vector_split_ortho():
+    JFK = Position("40°38′23″N 73°46′44″W")
+    AMS = Position("52°18′00″N 4°45′54″E")
+    result = (AMS / JFK).split_ortho(JFK, 10)
+    assert len(result) == 11
+    assert result[0] == JFK
+    assert result[-1] == AMS

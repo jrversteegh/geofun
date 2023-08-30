@@ -97,6 +97,35 @@ welcome.
    assert pos1 - org == rmbv
    assert pos1 / org == gcv
 
+
+Another example: flying from Kennedy Airport to Amsterdam Schiphol Airport and splitting
+both a great circle and a rhumbline route into segments
+
+.. code:: python
+
+   from geofun import Position, Vector
+
+   # Both airports
+   JFK = Position("40°38′23″N 73°46′44″W")
+   AMS = Position("52°18′00″N 4°45′54″E")
+
+   # Loxodromic route:
+   loxo = (AMS - JFK).split_loxo(JFK, 10)
+   # Print list of positions and flight vectors
+   print("\nLoxodrome JFK -> AMS:")
+   for p1, p2 in zip(loxo[:-1], loxo[1:]):
+     print(f"Position: {p1}, vector: {p2 - p1}")
+   print(f"Destination: {p2}")
+
+   # Orthodromic route:
+   ortho = (AMS / JFK).split_ortho(JFK, 10)
+   # Print list of positions and flight vectors
+   print("\nOrthodrome JFK -> AMS:")
+   for p1, p2 in zip(ortho[:-1], ortho[1:]):
+     print(f"Position: {p1}, vector: {p2 / p1}")
+   print(f"Destination: {p2}")
+
+
 Classes
 -------
 
