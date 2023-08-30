@@ -45,7 +45,7 @@ Compare:
 Installing
 ----------
 
-`pip install pygeofun` should work without needing to compile anything on Windows, Linux
+``pip install pygeofun`` should work without needing to compile anything on Windows, Linux
 (x86_64, aarch64) and MacOS 13 (x86_64) for python versions 3.8 - 3.11. For other
 platforms you might need to build the C++ parts.
 Wheel contributions for other platforms are very welcome.
@@ -108,8 +108,8 @@ welcome.
    assert pos1 / org == gcv
 
 
-Another example: flying from Kennedy Airport to Amsterdam Schiphol Airport and splitting
-both a great circle and a rhumbline route into segments
+Another example. Flying from Kennedy Airport to Amsterdam Schiphol Airport and splitting
+both a great circle and a rhumbline route into segments:
 
 .. code:: python
 
