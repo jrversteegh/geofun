@@ -41,6 +41,16 @@ Compare:
     'azi1': -139.28471885516532,
     'azi2': -152.90624110350674}
 
+
+Installing
+----------
+
+`pip install pygeofun` should work without needing to compile anything on Windows, Linux
+(x86_64, aarch64) and MacOS 13 (x86_64) for python versions 3.8 - 3.11. For other
+platforms you might need to build the C++ parts.
+Wheel contributions for other platforms are very welcome.
+
+
 Building
 --------
 
