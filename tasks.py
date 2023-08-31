@@ -57,8 +57,8 @@ def build(ctx):
                 "pyenv exec python --version",
                 "pyenv exec poetry env use python",
                 "pyenv exec poetry update",
-                "pyenv exec poetry install",
-                "pyenv exec poetry run poetry build",
+                "pyenv exec poetry run poetry build -vv",
+                "pyenv exec poetry run poetry install",
             ]
     else:
         for pyver in ("3.8", "3.9", "3.10", "3.11"):
@@ -66,8 +66,8 @@ def build(ctx):
                 "rm -rf build",
                 f"poetry env use {pyver}",
                 "poetry update",
-                "poetry install",
-                "poetry run poetry build",
+                "poetry run poetry build -vv",
+                "poetry run poetry install",
             ]
 
     for cmd in cmds:
