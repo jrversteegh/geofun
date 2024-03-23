@@ -2,7 +2,7 @@
 
 cd /tmp
 
-for ver in 3.8 3.9 3.10 3.11; do
+for ver in 3.9 3.10 3.11 3.12; do
   python$ver -m venv venv
   . venv/bin/activate
   pip install --only-binary pygeofun pygeofun || echo "########### Failed to get pygeofun"

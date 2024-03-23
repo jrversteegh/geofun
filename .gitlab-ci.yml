@@ -6,6 +6,8 @@ test:
   stage: test
   image: python:$VERSION
   script:
+    - echo "Testing on Python $VERSION"
+    - python --version
     - curl -sSL https://install.python-poetry.org | python -
     - export PATH="/root/.local/bin:$PATH"
     - poetry update
@@ -23,6 +25,7 @@ deploy_to_pypi:
   script:
     - echo "Building for Python $VERSION on $ARCH"
     - curl -sSL https://install.python-poetry.org | python -
+    - export PATH="/root/.local/bin:$PATH"
     - poetry update
     - poetry build
     - poetry config pypi-token.pypi $PYPI_API_TOKEN
@@ -32,7 +35,7 @@ deploy_to_pypi:
   parallel:
     matrix:
       - ARCH: [x64, x86]
-      - VERSION: ['3.8', '3.9', '3.10', '3.11', '3.12']
+      - VERSION: ['3.9', '3.10', '3.11', '3.12']
 
 deploy_to_pypi_x86:
   stage: deploy

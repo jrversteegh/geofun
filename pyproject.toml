@@ -33,7 +33,7 @@ homepage = "https://github.com/jrversteegh/geofun"
 repository = "https://github.com/jrversteegh/geofun"
 
 [tool.poetry.dependencies]
-python = "^3.8"
+python = "^3.9"
 
 [tool.poetry.extras]
 docs = ["Sphinx"]

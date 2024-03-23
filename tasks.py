@@ -48,7 +48,7 @@ def build(ctx):
     cmds = []
 
     if platform.platform().startswith("Win"):
-        for pyver in ("3.8.10", "3.9.13", "3.10.11", "3.11.5"):
+        for pyver in ("3.9.13", "3.10.11", "3.11.5"):
             cmds += [
                 "rmdir /S /Q build && echo 'Removed build dir' || echo 'No previous build'",
                 f"pyenv install {pyver}",
@@ -61,7 +61,7 @@ def build(ctx):
                 "pyenv exec poetry run poetry install",
             ]
     else:
-        for pyver in ("3.8", "3.9", "3.10", "3.11"):
+        for pyver in ("3.9", "3.10", "3.11", "3.12"):
             cmds += [
                 "rm -rf build",
                 f"poetry env use {pyver}",
