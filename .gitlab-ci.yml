@@ -1,0 +1,55 @@
+stages:
+  - test
+  - deploy
+
+variables:
+  DOCKER_COMMAND: curl -sSL https://install.python-poetry.org | python -; poetry update; poetry build; poetry config config pypi-token.pypi $PYPI_API_TOKEN; poetry publish --skip-existing
+  PACKAGE_NAME: "geofun"
+
+test:
+  stage: test
+  script:
+    - curl -sSL https://install.python-poetry.org | python -
+    - poetry update
+    - poetry install
+    - poetry run invoke test
+  only:
+    - master
+
+deploy_to_pypi:
+  stage: deploy
+  script:
+    - curl -sSL https://install.python-poetry.org | python -
+    - poetry update
+    - poetry build
+    - poetry config config pypi-token.pypi $PYPI_API_TOKEN
+    - poetry publish --skip-existing
+  only:
+    - tags
+
+deploy_to_pypi_x86:
+  stage: deploy
+  script:
+    - docker run --rm -v $(pwd):/mnt -w /mnt python:3.9-alpine sh -c "$DOCKER_COMMAND"
+  only:
+    - tags
+  tags:
+    - x86
+
+deploy_to_pypi_arm:
+  stage: deploy
+  script:
+    - docker run --rm -v $(pwd):/mnt -w /mnt arm32v7/python:3.9-alpine sh -c "$DOCKER_COMMAND"
+  only:
+    - tags
+  tags:
+    - arm
+
+deploy_to_pypi_aarch64:
+  stage: deploy
+  script:
+    - docker run --rm -v $(pwd):/mnt -w /mnt aarch64/python:3.9-alpine sh -c "$DOCKER_COMMAND"
+  only:
+    - tags
+  tags:
+    - aarch64
