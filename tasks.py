@@ -2,11 +2,6 @@ import inspect
 import os
 import platform
 from pathlib import Path
-
-# Monkey patch for invoke which isn't py311 ready. See https://github.com/pyinvoke/invoke/issues/833
-# TODO: remove once invoke supports python3.11
-if not hasattr(inspect, "getargspec"):
-    inspect.getargspec = inspect.getfullargspec
 from invoke import task
 
 os.chdir(Path(__file__).parent)
