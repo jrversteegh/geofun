@@ -11,7 +11,8 @@ test:
     - curl -sSL https://install.python-poetry.org | python -
     - export PATH="/root/.local/bin:$PATH"
     - poetry update
-    - poetry install
+    - poetry build
+    - poetry install -v
     - poetry run invoke test
   only:
     - master
