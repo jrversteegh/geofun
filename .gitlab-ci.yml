@@ -2,6 +2,10 @@ stages:
   - test
   - deploy
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+  GIT_SUBMODULE_DEPTH: 1
+
 test:
   stage: test
   image: python:$VERSION
