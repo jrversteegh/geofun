@@ -26,7 +26,7 @@ test:
 
 deploy_to_pypi:
   stage: deploy
-  image: python:$VERSION
+  image: $ARCH/python:$VERSION
   script:
     - echo "Building for Python $VERSION on $ARCH"
     - curl -sSL https://install.python-poetry.org | python -
@@ -39,32 +39,11 @@ deploy_to_pypi:
     - master
   parallel:
     matrix:
-      - ARCH: [x64, x86]
-      - VERSION: ['3.9', '3.10', '3.11', '3.12']
-
-deploy_to_pypi_x86:
-  stage: deploy
-  script:
-    - docker run --rm -v $(pwd):/mnt -w /mnt python:3.9-alpine sh -c "$DOCKER_COMMAND"
-  only:
-    - tags
-  tags:
-    - x86
-
-deploy_to_pypi_arm:
-  stage: deploy
-  script:
-    - docker run --rm -v $(pwd):/mnt -w /mnt arm32v7/python:3.9-alpine sh -c "$DOCKER_COMMAND"
-  only:
-    - tags
-  tags:
-    - arm
-
-deploy_to_pypi_aarch64:
-  stage: deploy
-  script:
-    - docker run --rm -v $(pwd):/mnt -w /mnt aarch64/python:3.9-alpine sh -c "$DOCKER_COMMAND"
-  only:
-    - tags
-  tags:
-    - aarch64
+      - ARCH: amd64
+        VERSION: ['3.9', '3.10', '3.11', '3.12']
+      - ARCH: i386
+        VERSION: ['3.9', '3.10', '3.11', '3.12']
+      - ARCH: arm32v7
+        VERSION: ['3.9', '3.10', '3.11', '3.12']
+      - ARCH: arm64v8
+        VERSION: ['3.9', '3.10', '3.11', '3.12']
