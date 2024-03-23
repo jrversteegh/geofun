@@ -1,34 +1,38 @@
-default:
-  image: python:3.11
-
 stages:
   - test
   - deploy
 
-variables:
-  DOCKER_COMMAND: curl -sSL https://install.python-poetry.org | python -; poetry update; poetry build; poetry config config pypi-token.pypi $PYPI_API_TOKEN; poetry publish --skip-existing
-  PACKAGE_NAME: "geofun"
-
 test:
   stage: test
+  image: python:$VERSION
   script:
     - curl -sSL https://install.python-poetry.org | python -
+    - export PATH="/root/.local/bin:$PATH"
     - poetry update
     - poetry install
     - poetry run invoke test
   only:
     - master
+  parallel:
+    matrix:
+      - VERSION: ['3.10', '3.11', '3.12']
 
 deploy_to_pypi:
   stage: deploy
+  image: python:$VERSION
   script:
+    - echo "Building for Python $VERSION on $ARCH"
     - curl -sSL https://install.python-poetry.org | python -
     - poetry update
     - poetry build
-    - poetry config config pypi-token.pypi $PYPI_API_TOKEN
+    - poetry config pypi-token.pypi $PYPI_API_TOKEN
     - poetry publish --skip-existing
   only:
-    - tags
+    - master
+  parallel:
+    matrix:
+      - ARCH: [x64, x86]
+      - VERSION: ['3.8', '3.9', '3.10', '3.11', '3.12']
 
 deploy_to_pypi_x86:
   stage: deploy
